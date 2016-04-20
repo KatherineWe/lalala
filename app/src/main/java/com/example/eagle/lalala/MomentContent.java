@@ -5,9 +5,18 @@ package com.example.eagle.lalala;
  */
 public class MomentContent {
 
-    String name;
+    int touxiang;
+    String mingzi;
+    String riqi;
+    int tupian;
+    String dianzanmingzi;
 
-    public MomentContent(String name) {
-        this.name = name;
+
+    public MomentContent(int touxiang, String mingzi, String riqi, int tupian, String dianzanmingzi) {
+        this.touxiang = touxiang;
+        this.mingzi = mingzi;
+        this.riqi = riqi;
+        this.tupian = tupian;
+        this.dianzanmingzi = dianzanmingzi;
     }
 }

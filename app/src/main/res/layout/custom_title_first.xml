@@ -21,7 +21,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/textView_titel_map"
+            android:id="@+id/textView_title_map"
             android:layout_weight="1"
             android:gravity="center"
             android:textColor="#ffffff"
@@ -31,7 +31,7 @@
         <TextView
             android:layout_weight="1"
             android:gravity="center"
-            android:id="@+id/textView_titel_list"
+            android:id="@+id/textView_title_list"
             android:textColor="#b0ffffff"
             android:text="@string/list"
             android:layout_width="wrap_content"

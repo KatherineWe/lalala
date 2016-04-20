@@ -17,10 +17,10 @@ import butterknife.OnClick;
 public class MainActivity extends SingleFragmentActivity {
 
 
-    @Bind(R.id.textView_titel_map)
-    TextView mTextViewTitelMap;
-    @Bind(R.id.textView_titel_list)
-    TextView mTextViewTitelList;
+    @Bind(R.id.textView_title_map)
+    TextView mTextViewTitleMap;
+    @Bind(R.id.textView_title_list)
+    TextView mTextViewTitleList;
     @Bind(R.id.btn_info_in_MainActivity)
     ImageButton mBtnInfoInMainActivity;
     @Bind(R.id.btn_search_in_MainActivity)
@@ -51,17 +51,17 @@ public class MainActivity extends SingleFragmentActivity {
         return new MapFragment();
     }
 
-    @OnClick({R.id.textView_titel_map, R.id.textView_titel_list, R.id.btn_info_in_MainActivity, R.id.btn_search_in_MainActivity})
+    @OnClick({R.id.textView_title_map, R.id.textView_title_list, R.id.btn_info_in_MainActivity, R.id.btn_search_in_MainActivity})
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.textView_titel_map:
-                mTextViewTitelMap.setTextColor(0xffffffff);
-                mTextViewTitelList.setTextColor(0xb0ffffff);
+            case R.id.textView_title_map:
+                mTextViewTitleMap.setTextColor(0xffffffff);
+                mTextViewTitleList.setTextColor(0xb0ffffff);
                 changeFrag(new MapFragment());
                 break;
-            case R.id.textView_titel_list:
-                mTextViewTitelList.setTextColor(0xffffffff);
-                mTextViewTitelMap.setTextColor(0xb0ffffff);
+            case R.id.textView_title_list:
+                mTextViewTitleList.setTextColor(0xffffffff);
+                mTextViewTitleMap.setTextColor(0xb0ffffff);
                 changeFrag(new SharedFragment());
                 break;
             case R.id.btn_info_in_MainActivity:
