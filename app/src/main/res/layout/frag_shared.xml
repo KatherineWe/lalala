@@ -4,56 +4,71 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginRight="40dp"
-        android:layout_marginBottom="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:gravity="center"
-            android:layout_weight="1"
-            android:id="@+id/btn_recommend"
-            android:text="@string/btn_recommend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:gravity="center"
-            android:layout_weight="1"
-            android:id="@+id/btn_focus"
-            android:text="@string/btn_focus"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:gravity="center"
-            android:layout_weight="1"
-            android:id="@+id/btn_hot"
-            android:text="@string/btn_hot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <TextView
-            android:gravity="center"
-            android:layout_weight="1"
-            android:id="@+id/btn_latest"
-            android:text="@string/btn_latest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <include layout="@layout/moment_frag_titlebar"/>
 
 
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fitsSystemWindows="true">
 
-    </LinearLayout>
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/mRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-   <android.support.v7.widget.RecyclerView
-       android:id="@+id/recycler_moment"
-       android:layout_width="match_parent"
-       android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+                <ListView
+                    android:id="@id/android:list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:cacheColorHint="@android:color/transparent"
+                    android:divider="@color/im_line_color"
+                    android:dividerHeight="1px"
+                    android:fadingEdge="none"
+                    android:fadingEdgeLength="0dp"
+                    android:focusable="true"
+                    android:transcriptMode="normal"
+                    android:listSelector="@android:color/transparent">
+                </ListView>
+
+                <LinearLayout
+                    android:id="@+id/editTextBodyLl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:gravity="center_vertical"
+                    android:layout_alignParentBottom="true"
+                    android:background="#f6f6f6"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    >
+
+                    <EditText
+                        android:id="@+id/circleEt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:layout_weight="1"
+                        android:hint="说点什么..."
+                        />
+
+                    <ImageView
+                        android:id="@+id/sendIv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="4dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/selector_send"/>
+                </LinearLayout>
+            </RelativeLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+
+    </RelativeLayout>
+
 
 
 

@@ -29,4 +29,7 @@ dependencies {
     compile files('libs/AMap_Search_V3.2.1_20160308.jar.jar')
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.android.support:design:23.3.0'
+    compile files('libs/universal-image-loader-1.9.4.jar')
+
+    compile 'com.commit451:PhotoView:1.2.4'
 }

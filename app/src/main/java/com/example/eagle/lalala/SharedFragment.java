@@ -1,19 +1,36 @@
 package com.example.eagle.lalala;
 
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.example.eagle.lalala.adapter.CircleAdapter;
+import com.example.eagle.lalala.bean.CircleItem;
+import com.example.eagle.lalala.bean.CommentConfig;
+import com.example.eagle.lalala.bean.CommentItem;
+import com.example.eagle.lalala.bean.FavortItem;
+import com.example.eagle.lalala.listener.SwpipeListViewOnScrollListener;
+import com.example.eagle.lalala.mvp.presenter.CirclePresenter;
+import com.example.eagle.lalala.mvp.view.ICircleView;
+import com.example.eagle.lalala.utils.CommonUtils;
+import com.example.eagle.lalala.utils.DatasUtil;
+import com.example.eagle.lalala.widgets.CommentListView;
+
 import java.util.List;
 
 import butterknife.Bind;
@@ -23,43 +40,93 @@ import butterknife.OnClick;
 /**
  * Created by eagle on 2016/4/9.
  */
-public class SharedFragment extends Fragment {
+public class SharedFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener, ICircleView {
 
-    List<MomentContent> contents;
+
+    ListView mCircleLv;
+    private CircleAdapter mAdapter;
+    private int mScreenHeight;
+    private int mEditTextBodyHeight;
+    private int mCurrentKeyboardH;
+    private int mSelectCircleItemH;
+    private int mSelectCommentItemOffset;
+
+    private CirclePresenter mPresenter;
+    private CommentConfig mCommentConfig;
 
     @Bind(R.id.btn_recommend)
     TextView mBtnRecommend;
     @Bind(R.id.btn_focus)
     TextView mBtnFocus;
-    @Bind(R.id.recycler_moment)
-    RecyclerView mRecyclerMoment;
-
-    private JuanAdapter mJuanAdapter;
+    @Bind(R.id.circleEt)
+    EditText mEditText;
+    @Bind(R.id.sendIv)
+    ImageView sendIv;
+    @Bind(R.id.editTextBodyLl)
+    LinearLayout mEditTextBody;
+    @Bind(R.id.mRefreshLayout)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        contents = new ArrayList<MomentContent>();
-        for (int i = 0; i < 20; ++i)
-            contents.add(new MomentContent(R.drawable.ic_account, "daobuming" + i, "2016/1/" + i, R.drawable.ic_account, "buguoruci"));
-
-
+        mPresenter = new CirclePresenter(this);
+//        initView();
+//        loadData();
     }
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_shared, container, false);
         ButterKnife.bind(this, v);
-
-        mRecyclerMoment.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mJuanAdapter = new JuanAdapter(contents);
-        mRecyclerMoment.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerMoment.setAdapter(mJuanAdapter);
-
+        mCircleLv = (ListView) v.findViewById(android.R.id.list);
+        initView();
+        loadData();
         return v;
     }
+
+
+    private void initView() {
+        mCircleLv.setOnScrollListener(new SwpipeListViewOnScrollListener(mSwipeRefreshLayout));
+        mCircleLv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mEditTextBody.getVisibility() == View.VISIBLE) {
+                    //mEditTextBody.setVisibility(View.GONE);
+                    //CommonUtils.hideSoftInput(MainActivity.this, mEditText);
+                    updateEditTextBodyVisible(View.GONE, null);
+                    return true;
+                }
+                return false;
+            }
+        });
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
+        // mAdapter = new CircleAdapter(getActivity());
+        mAdapter = new CircleAdapter(getActivity());
+        mAdapter.setCirclePresenter(mPresenter);
+        mCircleLv.setAdapter(mAdapter);
+        sendIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPresenter != null) {
+                    //发布评论
+                    String content = mEditText.getText().toString().trim();
+                    if (TextUtils.isEmpty(content)) {
+                        Toast.makeText(getActivity(), "评论内容不能为空...", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    mPresenter.addComment(content, mCommentConfig);
+                }
+                updateEditTextBodyVisible(View.GONE, null);
+            }
+        });
+
+        setViewTreeObserver();
+    }
+
 
     @Override
     public void onDestroyView() {
@@ -71,65 +138,208 @@ public class SharedFragment extends Fragment {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_recommend:
-                mJuanAdapter.notifyItemRemoved(2);
                 break;
             case R.id.btn_focus:
                 break;
         }
     }
 
-    class JuanHolder extends RecyclerView.ViewHolder {//未完待续
-        private TextView mTextView;//存放着的控件
-
-        @Bind(R.id.moment_head_portrait)
-        ImageView mMomentHeadPortrait;
-        @Bind(R.id.moment_user_name)
-        TextView mMomentUserName;
-        @Bind(R.id.moment_date)
-        TextView mMomentDate;
-        @Bind(R.id.moment_picture)
-        ImageView mMomentPicture;
-        @Bind(R.id.moment_like_names)
-        TextView mMomentLikeNames;
-        @Bind(R.id.moment_comment)
-        ListView mMomentComment;
-
-
-        public JuanHolder(View itemView) {//这个itemView就是Adapter传过来的自定义的，所以用它来获取控件
-            super(itemView);
-            ButterKnife.bind(this, itemView);
+    @Override
+    public void update2DeleteCircle(String circleId) {
+        List<CircleItem> circleItems = mAdapter.getDatas();
+        for (int i = 0; i < circleItems.size(); i++) {
+            if (circleId.equals(circleItems.get(i).getId())) {
+                circleItems.remove(i);
+                mAdapter.notifyDataSetChanged();//这里可以改善
+                return;
+            }
         }
     }
 
-    private class JuanAdapter extends RecyclerView.Adapter<JuanHolder> {
-        private List<MomentContent> mContents;
-
-        public JuanAdapter(List<MomentContent> contents) {
-            mContents = contents;
-        }
-
-        @Override
-        public int getItemCount() {
-            return mContents.size();
-        }
-
-        @Override
-        public JuanHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(getActivity()).inflate(R.layout.custom_moment, parent, false);
-            return new JuanHolder(view);//将布局的View传给Holder
-        }
-
-        @Override
-        public void onBindViewHolder(JuanHolder holder, int position) {//将Model层的数据连接”绑“上去
-            MomentContent temp = mContents.get(position);
-            holder.mMomentHeadPortrait.setImageResource(temp.touxiang);
-            holder.mMomentPicture.setImageResource(temp.tupian);
-            holder.mMomentDate.setText(temp.riqi);
-            holder.mMomentUserName.setText(temp.mingzi);
-            holder.mMomentLikeNames.setText(temp.dianzanmingzi);
-
+    @Override
+    public void update2AddFavorite(int circlePosition, FavortItem addItem) {
+        if (addItem != null) {
+            mAdapter.getDatas().get(circlePosition).getFavorters().add(addItem);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
+    @Override
+    public void update2DeleteFavort(int circlePosition, String favortId) {
+        List<FavortItem> items = mAdapter.getDatas().get(circlePosition).getFavorters();
+        for (int i = 0; i < items.size(); i++) {
+            if (favortId.equals(items.get(i).getId())) {
+                items.remove(i);
+                mAdapter.notifyDataSetChanged();
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void update2AddComment(int circlePosition, CommentItem addItem) {
+        if (addItem != null) {
+            mAdapter.getDatas().get(circlePosition).getComments().add(addItem);
+            mAdapter.notifyDataSetChanged();
+        }
+        //清空评论文本
+        mEditText.setText("");
+    }
+
+    @Override
+    public void update2DeleteComment(int circlePosition, String commentId) {
+        List<CommentItem> items = mAdapter.getDatas().get(circlePosition).getComments();
+        for (int i = 0; i < items.size(); i++) {
+            if (commentId.equals(items.get(i).getId())) {
+                items.remove(i);
+                mAdapter.notifyDataSetChanged();
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void updateEditTextBodyVisible(int visibility, CommentConfig commentConfig) {
+        mCommentConfig = commentConfig;
+        mEditTextBody.setVisibility(visibility);
+
+        measureCircleItemHighAndCommentItemOffset(commentConfig);
+
+        if (View.VISIBLE == visibility) {
+            mEditText.requestFocus();
+            //弹出键盘
+            CommonUtils.showSoftInput(mEditText.getContext(), mEditText);
+
+        } else if (View.GONE == visibility) {
+            //隐藏键盘
+            CommonUtils.hideSoftInput(mEditText.getContext(), mEditText);
+        }
+    }
+
+    /**
+     * 测量偏移量
+     *
+     * @param commentConfig
+     * @return
+     */
+    private int getListviewOffset(CommentConfig commentConfig) {
+        if (commentConfig == null)
+            return 0;
+        //这里如果你的listview上面还有其它占高度的控件，则需要减去该控件高度，listview的headview除外。
+        int listviewOffset = mScreenHeight - mSelectCircleItemH - mCurrentKeyboardH - mEditTextBodyHeight;
+        if (commentConfig.commentType == CommentConfig.Type.REPLY) {
+            //回复评论的情况
+            listviewOffset = listviewOffset + mSelectCommentItemOffset;
+        }
+        return listviewOffset;
+    }
+
+    private void measureCircleItemHighAndCommentItemOffset(CommentConfig commentConfig) {
+        if (commentConfig == null)
+            return;
+
+        int headViewCount = mCircleLv.getHeaderViewsCount();
+        int firstPosition = mCircleLv.getFirstVisiblePosition();
+        //只能返回当前可见区域（列表可滚动）的子项
+        View selectCircleItem = mCircleLv.getChildAt(headViewCount + commentConfig.circlePosition - firstPosition);
+        if (selectCircleItem != null) {
+            mSelectCircleItemH = selectCircleItem.getHeight();
+            if (headViewCount > 0 && firstPosition < headViewCount && commentConfig.circlePosition == 0) {
+                //如果有headView，而且head是可见的，并且处理偏移的位置是第一条动态，则将显示的headView的高度合并到第一条动态上
+                for (int i = firstPosition; i < headViewCount; i++) {
+                    mSelectCircleItemH += mCircleLv.getChildAt(i).getHeight();
+                }
+            }
+        }
+
+        if (commentConfig.commentType == CommentConfig.Type.REPLY) {
+            //回复评论的情况
+            CommentListView commentLv = (CommentListView) selectCircleItem.findViewById(R.id.commentList);
+            if (commentLv != null) {
+                //找到要回复的评论view,计算出该view距离所属动态底部的距离
+                View selectCommentItem = commentLv.getChildAt(commentConfig.commentPosition);
+                if (selectCommentItem != null) {
+                    //选择的commentItem距选择的CircleItem底部的距离
+                    mSelectCommentItemOffset = 0;
+                    View parentView = selectCommentItem;
+                    do {
+                        int subItemBottom = parentView.getBottom();
+                        parentView = (View) parentView.getParent();
+                        if (parentView != null) {
+                            mSelectCommentItemOffset += (parentView.getHeight() - subItemBottom);
+                        }
+                    } while (parentView != null && parentView != selectCircleItem);
+                }
+            }
+        }
+    }
+
+
+    private void setViewTreeObserver() {
+
+        final ViewTreeObserver swipeRefreshLayoutVTO = mSwipeRefreshLayout.getViewTreeObserver();
+        swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                mSwipeRefreshLayout.getWindowVisibleDisplayFrame(r);
+                int statusBarH = getStatusBarHeight();//状态栏高度
+                int screenH = mSwipeRefreshLayout.getRootView().getHeight();
+                if (r.top != statusBarH) {
+                    //在这个demo中r.top代表的是状态栏高度，在沉浸式状态栏时r.top＝0，通过getStatusBarHeight获取状态栏高度
+                    r.top = statusBarH;
+                }
+                int keyboardH = screenH - (r.bottom - r.top);
+
+                if (keyboardH == mCurrentKeyboardH) {//有变化时才处理，否则会陷入死循环
+                    return;
+                }
+
+                mCurrentKeyboardH = keyboardH;
+                mScreenHeight = screenH;//应用屏幕的高度
+                mEditTextBodyHeight = mEditTextBody.getHeight();
+
+                //偏移listview
+                if (mCircleLv != null && mCommentConfig != null) {
+                    int index = mCommentConfig.circlePosition == 0 ? mCommentConfig.circlePosition : (mCommentConfig.circlePosition + mCircleLv.getHeaderViewsCount());
+                    mCircleLv.setSelectionFromTop(index, getListviewOffset(mCommentConfig));
+                }
+            }
+        });
+    }
+
+    /**
+     * 获取状态栏高度
+     *
+     * @return
+     */
+    private int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    @Override
+    public void onRefresh() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadData();
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }, 2000);
+
+    }
+
+    private void loadData() {
+        List<CircleItem> datas = DatasUtil.createCircleDatas();
+        mAdapter.setDatas(datas);
+        mAdapter.notifyDataSetChanged();
+    }
 
 }
