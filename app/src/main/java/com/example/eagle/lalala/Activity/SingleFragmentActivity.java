@@ -1,10 +1,12 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.example.eagle.lalala.R;
 
 /**
  * Created by eagle on 2016/4/9.

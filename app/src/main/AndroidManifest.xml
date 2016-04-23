@@ -16,6 +16,9 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+
 
     <application
         android:name=".MyApplication"
@@ -32,31 +35,33 @@
             android:name="com.amap.api.v2.apikey"
             android:value="a7c433c1fc6b7d36fefd01f861b819ea" />
 
-        <activity android:name=".LoginActivity">
-
-
-        </activity>
-
-
-        <activity android:name=".MainActivity">
+        <activity android:name=".Activity.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
 
             </intent-filter>
-        </activity>
-
-        <activity android:name=".SignUpActivity">
 
         </activity>
 
-        <activity android:name=".InfoActivity">
+
+        <activity android:name=".Activity.MainActivity">
 
         </activity>
+
+        <activity android:name=".Activity.SignUpActivity">
+
+        </activity>
+
+        <activity android:name=".Activity.InfoActivity">
+
+        </activity>
+
+        <activity android:name=".Edit_marks_aty"/>
 
         <activity
-            android:name=".ImagePagerActivity"
+            android:name=".Activity.ImagePagerActivity"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
 

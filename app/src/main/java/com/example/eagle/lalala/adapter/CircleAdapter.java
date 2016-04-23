@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.eagle.lalala.ImagePagerActivity;
+import com.example.eagle.lalala.Activity.ImagePagerActivity;
 import com.example.eagle.lalala.MyApplication;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.bean.ActionItem;

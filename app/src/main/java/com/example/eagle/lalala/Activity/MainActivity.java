@@ -1,8 +1,10 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +17,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.eagle.lalala.Edit_marks_aty;
+import com.example.eagle.lalala.MapFragment;
+import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
+import com.example.eagle.lalala.R;
+import com.example.eagle.lalala.SharedFragment;
 import com.example.neilhy.floatingbutton_library.FloatingActionButton;
 import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 
@@ -28,6 +35,7 @@ import butterknife.OnClick;
 
 public class MainActivity extends SingleFragmentActivity implements View.OnClickListener {
 
+    private static final int TAKE_PHOTO=1;
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
@@ -98,7 +106,6 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
             }
         });
         setSupportActionBar(mToolbar);
-        setSupportActionBar(mToolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(toggle);
@@ -118,7 +125,6 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
         },500);//让这个按钮500毫秒之后显示出来
 
         TakePicture.createCustomAnimation(menuButton);//设置点击按钮后的动画，星星变叉
-
     }
 
     @Override
@@ -126,6 +132,12 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
         return new MapFragment();
     }
 
+    private void takePhoto(){
+        imageFile= HandlePicture.createFileForPhoto();//创建图片路径
+        Intent intent=new Intent("android.media.action.IMAGE_CAPTURE");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(imageFile));
+        startActivityForResult(intent,TAKE_PHOTO);//启动相机程序
+    }
 
     @OnClick({R.id.textView_title_map, R.id.textView_title_list, R.id.btn_info_in_MainActivity, R.id.btn_search_in_MainActivity})
     public void onClick(View view) {
@@ -141,8 +153,34 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
                 break;
             case R.id.btn_search_in_MainActivity:
                 break;
+            case R.id.fab_add:
+                Intent intent = new Intent(MainActivity.this, Edit_marks_aty.class);
+                startActivity(intent);
+                break;
+            case R.id.fab_camera:
+                takePhoto();
+                break;
+        }
+        menuButton.close(true);
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode != RESULT_OK)
+            return;
+        switch (requestCode) {
+            case TAKE_PHOTO:
+                    Edit_marks_aty.actionStart(MainActivity.this,imageFile.getAbsolutePath());
+                    break;
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
 }
