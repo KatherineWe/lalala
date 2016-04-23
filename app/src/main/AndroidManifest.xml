@@ -58,7 +58,7 @@
 
         </activity>
 
-        <activity android:name=".Edit_marks_aty" android:theme="@style/EditMark"/>
+        <activity android:name=".Edit_marks_aty" />
 
         <activity
             android:name=".Activity.ImagePagerActivity"
