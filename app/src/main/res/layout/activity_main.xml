@@ -1,61 +1,80 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:fitsSystemWindows="true">
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
+                                        xmlns:android="http://schemas.android.com/apk/res/android"
+                                        xmlns:app="http://schemas.android.com/apk/res-auto"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:fitsSystemWindows="true"
+                                        xmlns:fab="http://schemas.android.com/tools">
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/mRefreshLayout"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <RelativeLayout
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <ListView
-                android:id="@+id/circleLv"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:cacheColorHint="@android:color/transparent"
-                android:divider="@color/im_line_color"
-                android:dividerHeight="1px"
-                android:fadingEdge="none"
-                android:fadingEdgeLength="0dp"
-                android:focusable="true"
-                android:transcriptMode="normal"
-                android:listSelector="@android:color/transparent">
-            </ListView>
+                android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:id="@+id/editTextBodyLl"
+                <include layout="@layout/custom_title_first"/>
+
+            </android.support.v7.widget.Toolbar>
+
+            <FrameLayout
+                android:id="@+id/single_frag_container"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <com.example.neilhy.floatingbutton_library.FloatingActionMenu
+            android:id="@+id/menu_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="5dp"
+            fab:menu_icon="@drawable/ic_star"
+            fab:menu_colorNormal="#2b2a2b"
+            fab:menu_colorPressed="#454444"
+            fab:menu_colorRipple="#6a6b6b">
+
+            <com.example.neilhy.floatingbutton_library.FloatingActionButton
+                android:id="@+id/fab_add"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:gravity="center_vertical"
-                android:layout_alignParentBottom="true"
-                android:background="#f6f6f6"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                >
+                android:src="@drawable/ic_edit"
+                style="@style/MenuButtonsSmall"
+                fab:fab_label="Mark"/>
+            <com.example.neilhy.floatingbutton_library.FloatingActionButton
+                android:id="@+id/fab_camera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_progress"
+                style="@style/MenuButtonsSmall.Green"
+                fab:fab_label="Camera"/>
 
-                <EditText
-                    android:id="@+id/circleEt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:layout_weight="1"
-                    android:hint="说点什么..."
-                    />
+        </com.example.neilhy.floatingbutton_library.FloatingActionMenu>
 
-                <ImageView
-                    android:id="@+id/sendIv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="4dp"
-                    android:contentDescription="@null"
-                    android:src="@drawable/selector_send"/>
-            </LinearLayout>
-        </RelativeLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
 
-</RelativeLayout>
+    </FrameLayout>
+
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/drawer_header"
+        app:menu="@menu/menu_drawer"
+        ></android.support.design.widget.NavigationView>
+
+</android.support.v4.widget.DrawerLayout>

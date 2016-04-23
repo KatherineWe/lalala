@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_posted"
+            android:icon="@drawable/icon_nav_posted"
+            android:title="Posted" />
+        <item
+            android:id="@+id/menu_favorite"
+            android:icon="@drawable/icon_nav_favorite"
+            android:title="Favorite" />
+        <item
+            android:id="@+id/menu_likes"
+            android:icon="@drawable/icon_nav_likes"
+            android:title="Likes" />
+        <item
+            android:id="@+id/menu_message"
+            android:icon="@drawable/icon_nav_message"
+            android:title="Message" />
+        <item
+            android:id="@+id/menu_setting"
+            android:icon="@drawable/icon_nav_setting"
+            android:title="Setting" />
+
+    </group>
+
+</menu>
