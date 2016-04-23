@@ -7,7 +7,6 @@
         <!--<item name="colorPrimary">@color/colorPrimary</item>-->
         <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
         <!--<item name="colorAccent">@color/colorAccent</item>-->
-
         <!--导航栏底色-->
         <item name="colorPrimary">@color/accent_material_dark</item>
         <!--状态栏底色-->
@@ -25,6 +24,17 @@
         <!--EditText 输入框中字体的颜色-->
         <item name="editTextColor">@android:color/white</item>
 
+    </style>
+    <style name="EditMark" parent="Base.Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarPopupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="actionBarWidgetTheme">@null</item>
+        <item name="actionBarTheme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+
+        <!-- Panel attributes -->
+        <item name="listChoiceBackgroundIndicator">@drawable/abc_list_selector_holo_dark</item>
+
+        <item name="colorPrimaryDark">@color/highlighted_text_material_light</item>
+        <item name="colorPrimary">@color/material_blue_grey_900</item>
     </style>
 
     <style name="social_pop_anim" parent="android:Animation">

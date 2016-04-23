@@ -27,6 +27,7 @@ import com.example.eagle.lalala.mvp.view.ICircleView;
 import com.example.eagle.lalala.utils.CommonUtils;
 import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.eagle.lalala.widgets.CommentListView;
+import com.example.neilhy.pulltorefresh_lib.PtrDefaultHandler;
 import com.example.neilhy.pulltorefresh_lib.PtrFrameLayout;
 import com.example.neilhy.pulltorefresh_lib.PtrHandler;
 import com.example.neilhy.pulltorefresh_lib.header.StoreHouseHeader;
@@ -92,7 +93,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         header.setPadding(0,25,0,0);
         header.initWithString(getWeekOfDay());//获得当前星期的字符串
 
-        mPtrFrameLayout.setDurationToCloseHeader(3000);
+        mPtrFrameLayout.setDurationToCloseHeader(2000);
         mPtrFrameLayout.setHeaderView(header);
         mPtrFrameLayout.addPtrUIHandler(header);
 
@@ -106,7 +107,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         mPtrFrameLayout.setPtrHandler(new PtrHandler() {
             @Override
             public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return true;
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame,mCircleLv,header);
             }
 
             @Override

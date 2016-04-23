@@ -125,7 +125,7 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                         imagePick = TakePicture.handleImageBeforeKitKat(Edit_marks_aty.this, data);
                     }
                     if (imagePick != null) {
-                        Bitmap bitmap = HandlePicture.decodeSampleBitmapFromPath(imagePick, 180, 380);
+                        Bitmap bitmap = HandlePicture.decodeSampleBitmapFromPath(imagePick, 160, 420);
                         addPhotoBtn.setImageBitmap(bitmap);
                     }else{
                         Toast.makeText(this, "failed to get image", Toast.LENGTH_SHORT).show();
