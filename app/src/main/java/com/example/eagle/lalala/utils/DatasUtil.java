@@ -38,14 +38,12 @@ public class DatasUtil {
             "http://pic1.nipic.com/2008-12-09/200812910493588_2.jpg",
             "http://pic2.ooopic.com/11/79/98/31bOOOPICb1_1024.jpg"};
     public static final String[] HEADIMG = {
-            "http://img.wzfzl.cn/uploads/allimg/140820/co140R00Q925-14.jpg",
-            "http://www.feizl.com/upload2007/2014_06/1406272351394618.png",
-            "http://v1.qzone.cc/avatar/201308/30/22/56/5220b2828a477072.jpg%21200x200.jpg",
-            "http://v1.qzone.cc/avatar/201308/22/10/36/521579394f4bb419.jpg!200x200.jpg",
-            "http://v1.qzone.cc/avatar/201408/20/17/23/53f468ff9c337550.jpg!200x200.jpg",
-            "http://cdn.duitang.com/uploads/item/201408/13/20140813122725_8h8Yu.jpeg",
-            "http://img.woyaogexing.com/touxiang/nv/20140212/9ac2117139f1ecd8%21200x200.jpg",
-            "http://p1.qqyou.com/touxiang/uploadpic/2013-3/12/2013031212295986807.jpg"};
+            "http://img.pconline.com.cn/images/upload/upc/tx/wallpaper/1208/20/c3/13065102_1345473341142_800x800.jpg",
+            "http://tse4.mm.bing.net/th?id=OIP.Me8bcba93c4c513e76cc8b0217d8546a5o0&w=235&h=145&c=7&rs=1&qlt=90&o=4&pid=1.1",
+            "http://tse1.mm.bing.net/th?&id=OIP.Mb11d8a6de029a42d346ed4ad9120e7d6o0&w=300&h=187&c=0&pid=1.9&rs=0&p=0",
+            "http://tse1.mm.bing.net/th?id=OIP.Mb153dfd34a7bf3de39bac9f421be3d1co0&w=233&h=144&c=7&rs=1&qlt=90&o=4&pid=1.1",
+            "http://tse1.mm.bing.net/th?&id=OIP.Me3fd4652147671728223a428d2cddabao0&w=300&h=225&c=0&pid=1.9&rs=0&p=0",
+            "http://tse2.mm.bing.net/th?id=OIP.Maf3d0b615534fc34707a482f2fb80daao0&w=219&h=123&c=7&rs=1&qlt=90&o=4&pid=1.1",};
 
     public static List<User> users = new ArrayList<User>();
     /**
@@ -60,25 +58,25 @@ public class DatasUtil {
      * 评论id自增长
      */
     private static int commentId = 0;
-    public static final User curUser = new User("0", "自己", HEADIMG[0]);
+    public static final User curUser = new User("0", "道不明", HEADIMG[0]);
 
     static {
-        User user1 = new User("1", "张三", HEADIMG[1]);
-        User user2 = new User("2", "李四", HEADIMG[2]);
-        User user3 = new User("3", "隔壁老王", HEADIMG[3]);
-        User user4 = new User("4", "赵六", HEADIMG[4]);
-        User user5 = new User("5", "田七", HEADIMG[5]);
-        User user6 = new User("6", "Naoki", HEADIMG[6]);
-        User user7 = new User("7", "这个名字是不是很长，哈哈！因为我是用来测试换行的", HEADIMG[7]);
+        User user1 = new User("1", "邓梓君", HEADIMG[1]);
+        User user2 = new User("2", "Guan_Suns", HEADIMG[2]);
+        User user3 = new User("3", "Katherine", HEADIMG[3]);
+        User user4 = new User("4", "hy", HEADIMG[4]);
+//        User user5 = new User("5", "hy", HEADIMG[5]);
+//        User user6 = new User("6", "Naoki", HEADIMG[6]);
+//        User user7 = new User("7", "这个名字是不是很长，哈哈！因为我是用来测试换行的", HEADIMG[7]);
 
         users.add(curUser);
         users.add(user1);
         users.add(user2);
         users.add(user3);
         users.add(user4);
-        users.add(user5);
-        users.add(user6);
-        users.add(user7);
+//        users.add(user5);
+//        users.add(user6);
+//        users.add(user7);
     }
 
     public static List<CircleItem> createCircleDatas() {
@@ -89,7 +87,7 @@ public class DatasUtil {
             item.setId(String.valueOf(circleId++));
             item.setUser(user);
             item.setContent(getContent());
-            item.setCreateTime("12月24日");
+            item.setCreateTime("2016/4/20");
 
             item.setFavorters(createFavortItemList());
             item.setComments(createCommentItemList());

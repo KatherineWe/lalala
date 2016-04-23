@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <include layout="@layout/moment_frag_titlebar"/>
 
+    <com.example.neilhy.pulltorefresh_lib.PtrFrameLayout
+        android:id="@+id/FrameInStrFrag"
+        xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        cube_ptr:ptr_duration_to_close="300"
+        cube_ptr:ptr_duration_to_close_header="2000"
+        cube_ptr:ptr_keep_header_when_refresh="true"
+        cube_ptr:ptr_pull_to_fresh="false"
+        cube_ptr:ptr_ratio_of_header_height_to_refresh="1.2"
+        cube_ptr:ptr_resistance="1.7">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:fitsSystemWindows="true">
-
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/mRefreshLayout"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="#ffffff">
 
-            <RelativeLayout
+            <ListView
+                android:id="@id/android:list"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:cacheColorHint="@android:color/transparent"
+                android:divider="@color/im_line_color"
+                android:dividerHeight="1px"
+                android:fadingEdge="none"
+                android:fadingEdgeLength="0dp"
+                android:focusable="true"
+                android:listSelector="@android:color/transparent"
+                android:transcriptMode="normal">
+            </ListView>
 
-                <ListView
-                    android:id="@id/android:list"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:cacheColorHint="@android:color/transparent"
-                    android:divider="@color/im_line_color"
-                    android:dividerHeight="1px"
-                    android:fadingEdge="none"
-                    android:fadingEdgeLength="0dp"
-                    android:focusable="true"
-                    android:transcriptMode="normal"
-                    android:listSelector="@android:color/transparent">
-                </ListView>
+            <LinearLayout
+                android:id="@+id/editTextBodyLl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="#f6f6f6"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:visibility="gone"
+                >
 
-                <LinearLayout
-                    android:id="@+id/editTextBodyLl"
-                    android:layout_width="match_parent"
+                <EditText
+                    android:id="@+id/circleEt"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:gravity="center_vertical"
-                    android:layout_alignParentBottom="true"
-                    android:background="#f6f6f6"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    >
+                    android:layout_weight="1"
+                    android:background="@null"
+                    android:hint="说点什么..."
+                    />
 
-                    <EditText
-                        android:id="@+id/circleEt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@null"
-                        android:layout_weight="1"
-                        android:hint="说点什么..."
-                        />
+                <ImageView
+                    android:id="@+id/sendIv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/selector_send"/>
+            </LinearLayout>
+        </LinearLayout>
 
-                    <ImageView
-                        android:id="@+id/sendIv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="4dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/selector_send"/>
-                </LinearLayout>
-            </RelativeLayout>
-        </android.support.v4.widget.SwipeRefreshLayout>
-
-    </RelativeLayout>
-
-
+    </com.example.neilhy.pulltorefresh_lib.PtrFrameLayout>
 
 
 </LinearLayout>

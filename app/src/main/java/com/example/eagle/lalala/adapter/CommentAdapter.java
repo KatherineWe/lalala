@@ -81,6 +81,7 @@ public class CommentAdapter {
         View convertView = View.inflate(mContext,
                 R.layout.im_social_item_comment, null);
         TextView commentTv = (TextView) convertView.findViewById(R.id.commentTv);
+
         final CircleMovementMethod circleMovementMethod = new CircleMovementMethod(R.color.name_selector_color,
                 R.color.name_selector_color);
 
@@ -93,12 +94,12 @@ public class CommentAdapter {
         }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append(setClickableSpan(name, 0));
+        builder.append(setClickableSpan(name,id,0));
 
         if (!TextUtils.isEmpty(toReplyName)) {
 
             builder.append(" 回复 ");
-            builder.append(setClickableSpan(toReplyName, 1));
+            builder.append(setClickableSpan(toReplyName,id, 1));
         }
         builder.append(": ");
         //转换表情字符，也就是说还要打补充代码
@@ -133,10 +134,10 @@ public class CommentAdapter {
     }
 
     @NonNull
-    private SpannableString setClickableSpan(String textStr, int position) {
+    private SpannableString setClickableSpan(String textStr,String id, int position) {
         SpannableString subjectSpanText = new SpannableString(textStr);
         subjectSpanText.setSpan(new NameClickable(new NameClickListener(
-                        subjectSpanText, ""), position), 0, subjectSpanText.length(),
+                        subjectSpanText,id), position), 0, subjectSpanText.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return subjectSpanText;
     }

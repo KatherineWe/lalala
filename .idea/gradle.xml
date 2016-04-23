@@ -10,12 +10,16 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/floatingbutton_library" />
+            <option value="$PROJECT_DIR$/pulltorefresh-lib" />
           </set>
         </option>
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/floatingbutton_library" />
+            <option value="$PROJECT_DIR$/pulltorefresh-lib" />
           </set>
         </option>
       </GradleProjectSettings>

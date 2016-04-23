@@ -20,7 +20,7 @@ import com.example.eagle.lalala.utils.DatasUtil;
 /**
  * @author yiw
  * @ClassName: CommentDialog
- * @Description: 评论长按对话框，保护复制和删除
+ * @Description: 评论长按对话框，进行复制和删除
  * @date 2015-12-28 下午3:36:39
  */
 public class CommentDialog extends Dialog implements

@@ -3,6 +3,7 @@ package com.example.eagle.lalala;
 import android.app.Application;
 import android.content.Context;
 import android.os.Environment;
+import android.support.multidex.MultiDexApplication;
 
 import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -18,7 +19,7 @@ import java.io.File;
  * @Description: TODO(这里用一句话描述这个类的作用)全局的一些信息，目前放的主要是一些跟图片存储配置有关的东西
  * @date 2015-12-28 下午4:21:08
  */
-public class MyApplication extends Application {
+public class MyApplication extends MultiDexApplication {
     // 默认存放图片的路径
     public final static String DEFAULT_SAVE_IMAGE_PATH = Environment.getExternalStorageDirectory() + File.separator + "CircleDemo" + File.separator + "Images"
             + File.separator;
@@ -56,5 +57,7 @@ public class MyApplication extends Application {
 
         ImageLoader.getInstance().init(imageconfig);
     }
+
+
 
 }

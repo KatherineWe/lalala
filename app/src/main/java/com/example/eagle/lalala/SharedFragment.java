@@ -2,10 +2,8 @@ package com.example.eagle.lalala;
 
 import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,13 +22,17 @@ import com.example.eagle.lalala.bean.CircleItem;
 import com.example.eagle.lalala.bean.CommentConfig;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.bean.FavortItem;
-import com.example.eagle.lalala.listener.SwpipeListViewOnScrollListener;
 import com.example.eagle.lalala.mvp.presenter.CirclePresenter;
 import com.example.eagle.lalala.mvp.view.ICircleView;
 import com.example.eagle.lalala.utils.CommonUtils;
 import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.eagle.lalala.widgets.CommentListView;
+import com.example.neilhy.pulltorefresh_lib.PtrFrameLayout;
+import com.example.neilhy.pulltorefresh_lib.PtrHandler;
+import com.example.neilhy.pulltorefresh_lib.header.StoreHouseHeader;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.Bind;
@@ -40,8 +42,9 @@ import butterknife.OnClick;
 /**
  * Created by eagle on 2016/4/9.
  */
-public class SharedFragment extends ListFragment implements SwipeRefreshLayout.OnRefreshListener, ICircleView {
+public class SharedFragment extends ListFragment implements  ICircleView {
 
+    private String[] mStringList={"WeMark Sun.","WeMark Mon.","WeMark Tues.","WeMark Wed.","WeMark Thur.","WeMark Fri.","WeMark Sat."};
 
     ListView mCircleLv;
     private CircleAdapter mAdapter;
@@ -63,16 +66,13 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
     @Bind(R.id.sendIv)
     ImageView sendIv;
     @Bind(R.id.editTextBodyLl)
-    LinearLayout mEditTextBody;
-    @Bind(R.id.mRefreshLayout)
-    SwipeRefreshLayout mSwipeRefreshLayout;
+    LinearLayout mEditTextBody;;
+    private PtrFrameLayout mPtrFrameLayout;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPresenter = new CirclePresenter(this);
-//        initView();
-//        loadData();
     }
 
     @Override
@@ -80,6 +80,7 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
         View v = inflater.inflate(R.layout.frag_shared, container, false);
         ButterKnife.bind(this, v);
         mCircleLv = (ListView) v.findViewById(android.R.id.list);
+        mPtrFrameLayout = (PtrFrameLayout) v.findViewById(R.id.FrameInStrFrag);
         initView();
         loadData();
         return v;
@@ -87,7 +88,43 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
 
 
     private void initView() {
-        mCircleLv.setOnScrollListener(new SwpipeListViewOnScrollListener(mSwipeRefreshLayout));
+        StoreHouseHeader header = new StoreHouseHeader(getActivity());
+        header.setPadding(0,25,0,0);
+        header.initWithString(getWeekOfDay());//获得当前星期的字符串
+
+        mPtrFrameLayout.setDurationToCloseHeader(3000);
+        mPtrFrameLayout.setHeaderView(header);
+        mPtrFrameLayout.addPtrUIHandler(header);
+
+        mPtrFrameLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPtrFrameLayout.autoRefresh(false);
+            }
+        },100);
+
+        mPtrFrameLayout.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return true;
+            }
+
+            @Override
+            public void onRefreshBegin(final PtrFrameLayout frame) {
+                frame.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        loadData();
+                        frame.refreshComplete();
+                    }
+                }, 2000);
+            }
+        });
+
+
+
+
+       // mCircleLv.setOnScrollListener(new SwpipeListViewOnScrollListener(mSwipeRefreshLayout));
         mCircleLv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -100,9 +137,10 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
                 return false;
             }
         });
-        mSwipeRefreshLayout.setOnRefreshListener(this);
-        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
-                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
+//        mSwipeRefreshLayout.setOnRefreshListener(this);
+//        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+//                android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
         // mAdapter = new CircleAdapter(getActivity());
         mAdapter = new CircleAdapter(getActivity());
@@ -127,6 +165,16 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
         setViewTreeObserver();
     }
 
+    private String getWeekOfDay(){
+        Calendar calendar=Calendar.getInstance();
+        Date date=new Date();
+        calendar.setTime(date);
+        int datOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        if (datOfWeek < 0) {
+            datOfWeek=0;
+        }
+        return mStringList[datOfWeek];
+    }
 
     @Override
     public void onDestroyView() {
@@ -277,15 +325,15 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
 
     private void setViewTreeObserver() {
 
-        final ViewTreeObserver swipeRefreshLayoutVTO = mSwipeRefreshLayout.getViewTreeObserver();
+        final ViewTreeObserver swipeRefreshLayoutVTO = mPtrFrameLayout.getViewTreeObserver();
         swipeRefreshLayoutVTO.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
 
                 Rect r = new Rect();
-                mSwipeRefreshLayout.getWindowVisibleDisplayFrame(r);
+                mPtrFrameLayout.getWindowVisibleDisplayFrame(r);
                 int statusBarH = getStatusBarHeight();//状态栏高度
-                int screenH = mSwipeRefreshLayout.getRootView().getHeight();
+                int screenH = mPtrFrameLayout.getRootView().getHeight();
                 if (r.top != statusBarH) {
                     //在这个demo中r.top代表的是状态栏高度，在沉浸式状态栏时r.top＝0，通过getStatusBarHeight获取状态栏高度
                     r.top = statusBarH;
@@ -323,18 +371,18 @@ public class SharedFragment extends ListFragment implements SwipeRefreshLayout.O
         return result;
     }
 
-    @Override
-    public void onRefresh() {
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadData();
-                mSwipeRefreshLayout.setRefreshing(false);
-            }
-        }, 2000);
-
-    }
+//    @Override
+//    public void onRefresh() {
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                loadData();
+//                mSwipeRefreshLayout.setRefreshing(false);
+//            }
+//        }, 2000);
+//
+//    }
 
     private void loadData() {
         List<CircleItem> datas = DatasUtil.createCircleDatas();
