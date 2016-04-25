@@ -27,6 +27,7 @@ import com.example.eagle.lalala.mvp.view.ICircleView;
 import com.example.eagle.lalala.utils.CommonUtils;
 import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.eagle.lalala.widgets.CommentListView;
+import com.example.neilhy.pulltorefresh_lib.PtrDefaultHandler;
 import com.example.neilhy.pulltorefresh_lib.PtrFrameLayout;
 import com.example.neilhy.pulltorefresh_lib.PtrHandler;
 import com.example.neilhy.pulltorefresh_lib.header.StoreHouseHeader;
@@ -72,13 +73,14 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPresenter = new CirclePresenter(this);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.frag_shared, container, false);
         ButterKnife.bind(this, v);
+        mPresenter = new CirclePresenter(this);
         mCircleLv = (ListView) v.findViewById(android.R.id.list);
         mPtrFrameLayout = (PtrFrameLayout) v.findViewById(R.id.FrameInStrFrag);
         initView();
@@ -106,7 +108,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         mPtrFrameLayout.setPtrHandler(new PtrHandler() {
             @Override
             public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
-                return true;
+                return PtrDefaultHandler.checkContentCanBePulledDown(frame, mCircleLv, header);
             }
 
             @Override
@@ -120,7 +122,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 }, 2000);
             }
         });
-
 
 
 
