@@ -26,4 +26,5 @@
     <string name="radio_some">部分可见</string>
     <string name="edit_sure">确定</string>
     <string name="edit_save">保存</string>
+    <string name="title_activity_contact">ContactActivity</string>
 </resources>

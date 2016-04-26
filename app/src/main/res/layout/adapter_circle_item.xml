@@ -58,12 +58,19 @@
                 android:paddingTop="5dip"
                 android:textColor="@color/color_232323"
                 android:textSize="14sp"/>
-            <!-- 不同的地方 -->
-            <ViewStub
-                android:id="@+id/linkOrImgViewStub"
+            <!--&lt;!&ndash; 不同的地方 &ndash;&gt;-->
+            <!--<ViewStub-->
+                <!--android:id="@+id/linkOrImgViewStub"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--/>-->
+
+            <ImageView
+                android:id="@+id/imgInLv"
+                android:layout_marginTop="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                />
+                android:layout_height="wrap_content"/>
+
             <!-- 地址、时间 、删除 、点赞、 评论 -->
             <LinearLayout
                 android:layout_width="match_parent"

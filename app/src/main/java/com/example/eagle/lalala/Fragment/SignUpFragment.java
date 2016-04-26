@@ -1,4 +1,4 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.eagle.lalala.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

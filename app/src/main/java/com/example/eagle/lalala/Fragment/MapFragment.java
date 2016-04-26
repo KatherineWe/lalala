@@ -1,4 +1,4 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Fragment;
 
 import android.graphics.Color;
 import android.location.LocationListener;
@@ -20,6 +20,7 @@ import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.MyLocationStyle;
+import com.example.eagle.lalala.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

@@ -7,9 +7,12 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +21,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.eagle.lalala.Edit_marks_aty;
-import com.example.eagle.lalala.MapFragment;
+import com.example.eagle.lalala.Fragment.LoginFragment;
+import com.example.eagle.lalala.Fragment.MapFragment;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
 import com.example.eagle.lalala.R;
-import com.example.eagle.lalala.SharedFragment;
+import com.example.eagle.lalala.Fragment.SharedFragment;
 import com.example.neilhy.floatingbutton_library.FloatingActionButton;
 import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 
@@ -33,7 +37,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 
-public class MainActivity extends SingleFragmentActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO=1;
 
@@ -63,6 +67,9 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
     private Handler mUiHandler=new Handler();
     private File imageFile;
 
+    private Fragment mMapFrgment;
+    private Fragment mListFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +82,14 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
 
 
     private void init() {
+        mMapFrgment = new MapFragment();
+        mListFragment = new SharedFragment();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.single_frag_container,mListFragment,"list_frag")
+                .add(R.id.single_frag_container,mMapFrgment,"map_frag")
+                .hide(mListFragment)
+                .commit();
+
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -122,15 +137,15 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
             public void run() {
                 menuButton.showMenuButton(true);
             }
-        },500);//让这个按钮500毫秒之后显示出来
+        },800);//让这个按钮800毫秒之后显示出来
 
         TakePicture.createCustomAnimation(menuButton);//设置点击按钮后的动画，星星变叉
     }
 
-    @Override
-    protected Fragment creatFragment() {
-        return new MapFragment();
-    }
+//    @Override
+//    protected Fragment creatFragment() {
+//        return mMapFrgment;
+//    }
 
     private void takePhoto(){
         imageFile= HandlePicture.createFileForPhoto();//创建图片路径
@@ -143,10 +158,12 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.textView_title_map:
-                changeFrag(new MapFragment());
+                changeFrag(mListFragment,mMapFrgment);
+                //changeFrag(getSupportFragmentManager().findFragmentByTag("list_frag"),getSupportFragmentManager().findFragmentByTag("map_frag"));
                 break;
             case R.id.textView_title_list:
-                changeFrag(new SharedFragment());
+                changeFrag(mMapFrgment,mListFragment);
+                //changeFrag(getSupportFragmentManager().findFragmentByTag("map_frag"),getSupportFragmentManager().findFragmentByTag("list_frag"));
                 break;
             case R.id.btn_info_in_MainActivity:
                 startActivity(new Intent(MainActivity.this, InfoActivity.class));
@@ -163,6 +180,15 @@ public class MainActivity extends SingleFragmentActivity implements View.OnClick
         }
         menuButton.close(true);
     }
+
+    private void changeFrag(Fragment from,Fragment to) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(!to.isAdded())
+            transaction.hide(from).add(R.id.single_frag_container, to).commit();
+        else
+            transaction.hide(from).show(to).commit();
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode != RESULT_OK)

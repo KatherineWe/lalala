@@ -14,6 +14,8 @@
     <color name="transparent">#00000000</color>
     <color name="bg_no_photo">#EEEEEE</color>
 
+    <color name="windows_color">#F5F5F5</color>
+    <color name="greeny">#ff11aca6</color>
     <color name="grey"> #ebebeb</color>
     <color name="black"> #000000</color>
     <color name="darkgrey"> #999999</color>
@@ -22,11 +24,13 @@
     <color name="green">#CCFF99</color>
     <color name="gary">#333333</color>
     <color name="gray_lite">#c5c5c5</color>
+    <color name="black2">#ffeeeeee</color>
     <color name="itemlist">#f4f4f4</color>
     <color name="watermark_hint">#ccffffff</color>
     <color name="act_background">#efefef</color>
 
     <color name="tv_transp_selected">#ffffffff</color>
     <color name="tv_transp_normal">#b0ffffff</color>
+    <color name="gray">#ff808080</color>
 
 </resources>

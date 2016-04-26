@@ -1,4 +1,4 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Fragment;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.MainActivity;
 import com.example.eagle.lalala.Activity.SignUpActivity;
+import com.example.eagle.lalala.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

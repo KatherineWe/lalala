@@ -42,15 +42,6 @@ import java.util.List;
  * @date 2015-12-28 上午09:37:23
  */
 public class CircleAdapter extends BaseAdapter {
-    private static final int ITEM_VIEW_TYPE_DEFAULT = 0;
-    private static final int ITEM_VIEW_TYPE_URL = 1;
-    private static final int ITEM_VIEW_TYPE_IMAGE = 2;
-
-
-    private static final String ITEM_TYPE_URL = "1";
-    private static final String ITEM_TYPE_IMAGE = "2";
-    private static final int ITEM_VIEW_TYPE_COUNT = 3;//所发票圈类型数量
-
     private Context mContext;
     private CirclePresenter mPresenter;
     private List<CircleItem> datas = new ArrayList<CircleItem>();
@@ -73,30 +64,6 @@ public class CircleAdapter extends BaseAdapter {
         mContext = context;
     }
 
-//	public CircleAdapter(Context context, List<? extends Map<String, ?>> data, int resource, String[] from, int[] to, Context context1) {
-//		super(context, data, resource, from, to);
-//		mContext = context1;
-//	}
-
-    @Override
-    public int getItemViewType(int position) {
-        int itemType = ITEM_VIEW_TYPE_DEFAULT;
-        CircleItem item = datas.get(position);
-        if (ITEM_TYPE_URL.equals(item.getType())) {
-            itemType = ITEM_VIEW_TYPE_URL;
-        } else if (ITEM_TYPE_IMAGE.equals(item.getType())) {
-            itemType = ITEM_VIEW_TYPE_IMAGE;
-        } else {
-            itemType = ITEM_VIEW_TYPE_DEFAULT;
-        }
-        return itemType;
-    }
-
-    @Override
-    public int getViewTypeCount() {
-        return ITEM_VIEW_TYPE_COUNT;
-    }
-
     @Override
     public int getCount() {
         return datas.size();
@@ -116,34 +83,11 @@ public class CircleAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         System.out.println("CircleAdaptr getView----------" + position);
 
-        int itemViewType = getItemViewType(position);
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
             convertView = View.inflate(mContext, R.layout.adapter_circle_item, null);
-            ViewStub linkOrImgViewStub = (ViewStub) convertView.findViewById(R.id.linkOrImgViewStub);
-            switch (itemViewType) {
-                case ITEM_VIEW_TYPE_URL:// 链接view
-                    linkOrImgViewStub.setLayoutResource(R.layout.viewstub_urlbody);
-                    linkOrImgViewStub.inflate();
-                    LinearLayout urlBodyView = (LinearLayout) convertView.findViewById(R.id.urlBody);
-                    if (urlBodyView != null) {
-                        holder.urlBody = urlBodyView;
-                        holder.urlImageIv = (ImageView) convertView.findViewById(R.id.urlImageIv);
-                        holder.urlContentTv = (TextView) convertView.findViewById(R.id.urlContentTv);
-                    }
-                    break;
-                case ITEM_VIEW_TYPE_IMAGE:// 图片view
-                    linkOrImgViewStub.setLayoutResource(R.layout.viewstub_imgbody);
-                    linkOrImgViewStub.inflate();
-                    MultiImageView multiImageView = (MultiImageView) convertView.findViewById(R.id.multiImagView);
-                    if (multiImageView != null) {
-                        holder.multiImageView = multiImageView;
-                    }
-                    break;
-                default:
-                    break;
-            }
+
             holder.headIv = (CircularImage) convertView.findViewById(R.id.headIv);
             holder.nameTv = (TextView) convertView.findViewById(R.id.nameTv);
             holder.digLine = convertView.findViewById(R.id.lin_dig);
@@ -155,6 +99,7 @@ public class CircleAdapter extends BaseAdapter {
             holder.snsBtn = (ImageView) convertView.findViewById(R.id.snsBtn);
             holder.favortListTv = (FavortListView) convertView.findViewById(R.id.favortListTv);
 
+            holder.imageView = (ImageView)convertView.findViewById(R.id.imgInLv);
             holder.digCommentBody = (LinearLayout) convertView.findViewById(R.id.digCommentBody);
 
             holder.commentList = (CommentListView) convertView.findViewById(R.id.commentList);
@@ -175,6 +120,7 @@ public class CircleAdapter extends BaseAdapter {
         final String circleId = circleItem.getId();
         String name = circleItem.getUser().getName();
         String headImg = circleItem.getUser().getHeadUrl();
+        final String mainImg = circleItem.getPhoto();
         String content = circleItem.getContent();
         String createTime = circleItem.getCreateTime();
         final List<FavortItem> favortDatas = circleItem.getFavorters();
@@ -183,10 +129,12 @@ public class CircleAdapter extends BaseAdapter {
         boolean hasComment = circleItem.hasComment();
 
         ImageLoader.getInstance().displayImage(headImg, holder.headIv);
+        ImageLoader.getInstance().displayImage(mainImg, holder.imageView);//????
         holder.nameTv.setText(name);
         holder.timeTv.setText(createTime);
         holder.contentTv.setText(content);
         holder.contentTv.setVisibility(TextUtils.isEmpty(content) ? View.GONE : View.VISIBLE);
+        //holder.imageView.setImageURI(mainImg);
 
         if (DatasUtil.curUser.getId().equals(circleItem.getUser().getId())) {
             holder.deleteBtn.setVisibility(View.VISIBLE);
@@ -283,35 +231,17 @@ public class CircleAdapter extends BaseAdapter {
         });
 
         holder.urlTipTv.setVisibility(View.GONE);
-        switch (itemViewType) {
-            case ITEM_VIEW_TYPE_URL:// 处理链接动态的链接内容和和图片
-                String linkImg = circleItem.getLinkImg();
-                String linkTitle = circleItem.getLinkTitle();
-                ImageLoader.getInstance().displayImage(linkImg, holder.urlImageIv);
-                holder.urlContentTv.setText(linkTitle);
-                holder.urlBody.setVisibility(View.VISIBLE);
-                holder.urlTipTv.setVisibility(View.VISIBLE);
-                break;
-            case ITEM_VIEW_TYPE_IMAGE:// 处理图片
-                final List<String> photos = circleItem.getPhotos();
-                if (photos != null && photos.size() > 0) {
-                    holder.multiImageView.setVisibility(View.VISIBLE);
-                    holder.multiImageView.setList(photos);
-                    holder.multiImageView.setOnItemClickListener(new MultiImageView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, int position) {
-                            // 因为单张图片时，图片实际大小是自适应的，imageLoader缓存时是按测量尺寸缓存的
-                            ImagePagerActivity.imageSize = new ImageSize(view.getMeasuredWidth(), view.getMeasuredHeight());
-                            ImagePagerActivity.startImagePagerActivity(mContext, photos, position);
-                        }
-                    });
-                } else {
-                    holder.multiImageView.setVisibility(View.GONE);
-                }
-                break;
-            default:
-                break;
-        }
+        final int width = holder.imageView.getMeasuredWidth();
+        final int height =  holder.imageView.getMeasuredHeight();
+        holder.imageView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<String> temp = new ArrayList<String>();
+                temp.add(mainImg);
+                ImagePagerActivity.imageSize = new ImageSize(width,height);
+                ImagePagerActivity.startImagePagerActivity(mContext,temp , position);
+            }
+        });
         return convertView;
     }
 
@@ -331,7 +261,6 @@ public class CircleAdapter extends BaseAdapter {
          */
         public FavortListView favortListTv;
 
-        public LinearLayout urlBody;
         public LinearLayout digCommentBody;
         public View digLine;
 
@@ -340,17 +269,9 @@ public class CircleAdapter extends BaseAdapter {
          */
         public CommentListView commentList;
         /**
-         * 链接的图片
-         */
-        public ImageView urlImageIv;
-        /**
-         * 链接的标题
-         */
-        public TextView urlContentTv;
-        /**
          * 图片
          */
-        public MultiImageView multiImageView;
+        public ImageView imageView;
         // ===========================
         public FavortListAdapter favortListAdapter;
         //public CommentAdapter bbsAdapter;

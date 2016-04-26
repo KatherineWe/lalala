@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.example.eagle.lalala.R;
@@ -30,9 +31,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
         }
     }
 
-    protected void changeFrag(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.single_frag_container, fragment).commit();
+    protected void changeFrag(Fragment from,Fragment to) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if(!to.isAdded())
+            transaction.hide(from).add(R.id.single_frag_container, to).commit();
+        else
+            transaction.hide(from).show(to).commit();
     }
 
 }

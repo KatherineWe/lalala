@@ -1,5 +1,7 @@
-package com.example.eagle.lalala;
+package com.example.eagle.lalala.Fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.adapter.CircleAdapter;
 import com.example.eagle.lalala.bean.CircleItem;
 import com.example.eagle.lalala.bean.CommentConfig;
@@ -69,6 +72,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     @Bind(R.id.editTextBodyLl)
     LinearLayout mEditTextBody;;
     private PtrFrameLayout mPtrFrameLayout;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -125,7 +129,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
 
 
-       // mCircleLv.setOnScrollListener(new SwpipeListViewOnScrollListener(mSwipeRefreshLayout));
         mCircleLv.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -139,11 +142,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
             }
         });
 
-//        mSwipeRefreshLayout.setOnRefreshListener(this);
-//        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
-//                android.R.color.holo_orange_light, android.R.color.holo_red_light);
-
-        // mAdapter = new CircleAdapter(getActivity());
         mAdapter = new CircleAdapter(getActivity());
         mAdapter.setCirclePresenter(mPresenter);
         mCircleLv.setAdapter(mAdapter);
@@ -371,19 +369,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         }
         return result;
     }
-
-//    @Override
-//    public void onRefresh() {
-//
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                loadData();
-//                mSwipeRefreshLayout.setRefreshing(false);
-//            }
-//        }, 2000);
-//
-//    }
 
     private void loadData() {
         List<CircleItem> datas = DatasUtil.createCircleDatas();

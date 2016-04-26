@@ -2,7 +2,7 @@ package com.example.eagle.lalala.Activity;
 
 import android.support.v4.app.Fragment;
 
-import com.example.eagle.lalala.SignUpFragment;
+import com.example.eagle.lalala.Fragment.SignUpFragment;
 
 /**
  * Created by eagle on 2016/4/13.

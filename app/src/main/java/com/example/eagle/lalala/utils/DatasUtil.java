@@ -45,6 +45,8 @@ public class DatasUtil {
             "http://tse1.mm.bing.net/th?&id=OIP.Me3fd4652147671728223a428d2cddabao0&w=300&h=225&c=0&pid=1.9&rs=0&p=0",
             "http://tse2.mm.bing.net/th?id=OIP.Maf3d0b615534fc34707a482f2fb80daao0&w=219&h=123&c=7&rs=1&qlt=90&o=4&pid=1.1",};
 
+    public static List<CircleItem> circleDatas;
+
     public static List<User> users = new ArrayList<User>();
     /**
      * 动态id自增长
@@ -65,22 +67,21 @@ public class DatasUtil {
         User user2 = new User("2", "Guan_Suns", HEADIMG[2]);
         User user3 = new User("3", "Katherine", HEADIMG[3]);
         User user4 = new User("4", "hy", HEADIMG[4]);
-//        User user5 = new User("5", "hy", HEADIMG[5]);
-//        User user6 = new User("6", "Naoki", HEADIMG[6]);
-//        User user7 = new User("7", "这个名字是不是很长，哈哈！因为我是用来测试换行的", HEADIMG[7]);
 
         users.add(curUser);
         users.add(user1);
         users.add(user2);
         users.add(user3);
         users.add(user4);
-//        users.add(user5);
-//        users.add(user6);
-//        users.add(user7);
+    }
+
+    public static List<CircleItem> getCircleDatas() {
+        return circleDatas;
     }
 
     public static List<CircleItem> createCircleDatas() {
-        List<CircleItem> circleDatas = new ArrayList<CircleItem>();
+       // List<CircleItem> circleDatas = new ArrayList<CircleItem>();
+        circleDatas = new ArrayList<CircleItem>();
         for (int i = 0; i < 15; i++) {
             CircleItem item = new CircleItem();
             User user = getUser();
@@ -91,14 +92,8 @@ public class DatasUtil {
 
             item.setFavorters(createFavortItemList());
             item.setComments(createCommentItemList());
-            if (getRandomNum(10) % 2 == 0) {
-                item.setType("1");// 链接
-                item.setLinkImg("http://pics.sc.chinaz.com/Files/pic/icons128/2264/%E8%85%BE%E8%AE%AFQQ%E5%9B%BE%E6%A0%87%E4%B8%8B%E8%BD%BD1.png");
-                item.setLinkTitle("百度一下，你就知道");
-            } else {
-                item.setType("2");// 图片
-                item.setPhotos(createPhotos());
-            }
+            item.setPhoto(createPhoto());
+
             circleDatas.add(item);
         }
 
@@ -119,23 +114,8 @@ public class DatasUtil {
         return result;
     }
 
-    public static List<String> createPhotos() {
-        List<String> photos = new ArrayList<String>();
-        int size = getRandomNum(PHOTOS.length);
-        if (size > 0) {
-            if (size > 9) {
-                size = 9;
-            }
-            for (int i = 0; i < size; i++) {
-                String photo = PHOTOS[getRandomNum(PHOTOS.length)];
-                if (!photos.contains(photo)) {
-                    photos.add(photo);
-                } else {
-                    i--;
-                }
-            }
-        }
-        return photos;
+    public static String createPhoto() {
+        return PHOTOS[getRandomNum(PHOTOS.length)];
     }
 
     public static List<FavortItem> createFavortItemList() {

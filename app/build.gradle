@@ -41,4 +41,5 @@ dependencies {
     compile 'com.commit451:PhotoView:1.2.4'
     compile project(':floatingbutton_library')
     compile project(':pulltorefresh-lib')
+    compile files('libs/pinyin4j-2.5.0.jar')
 }
