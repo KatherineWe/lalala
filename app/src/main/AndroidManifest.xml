@@ -33,11 +33,7 @@
         <activity android:name=".Activity.LoginActivity">
         </activity>
         <activity android:name=".Activity.MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity android:name=".Activity.SignUpActivity">
         </activity>
@@ -52,6 +48,14 @@
             android:name=".Activity.ContactActivity"
             android:label="@string/title_activity_contact"
             android:theme="@style/AppTheme">
+
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+
         </activity>
     </application>
 

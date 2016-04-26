@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.adapter.ContactAdapter;
+import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.eagle.lalala.widgets.SideBar;
 
 /**
@@ -92,8 +93,8 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
 
     private void initData() {
 //        if (GloableParams.UserInfos != null) {
-//                lvContact.setAdapter(new ContactAdapter(getActivity(),
-//                        GloableParams.UserInfos));
+                lvContact.setAdapter(new ContactAdapter(getActivity(),
+                        DatasUtil.getUsers()));
 //            } else {
 //                FinalDb db = FinalDb
 //                        .create(getActivity(), Constants.DB_NAME, false);

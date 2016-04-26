@@ -79,6 +79,10 @@ public class DatasUtil {
         return circleDatas;
     }
 
+    public static List<User> getUsers() {
+        return users;
+    }
+
     public static List<CircleItem> createCircleDatas() {
        // List<CircleItem> circleDatas = new ArrayList<CircleItem>();
         circleDatas = new ArrayList<CircleItem>();
