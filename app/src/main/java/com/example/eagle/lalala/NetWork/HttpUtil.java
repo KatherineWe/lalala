@@ -90,7 +90,7 @@ public class HttpUtil  {
                         }
 
                         Log.i("HttpUtil", builder.toString());
-                        
+
                         JSONObject jsonObject = new JSONObject(builder.toString());
                         if (listener != null) {
                             //回调onFinish方法

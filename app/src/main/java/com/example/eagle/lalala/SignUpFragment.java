@@ -30,7 +30,8 @@ import butterknife.OnClick;
  */
 public class SignUpFragment extends Fragment {
 
-    private static final String serviceUrl="http://119.29.166.177:8080//signUp";
+    private static final String serviceUrl="http://119.29.166.177:8080/signUp";
+    private ProgressDialog progressDialog;
 
     @Bind(R.id.input_nickname)
     EditText mInputNickname;
@@ -59,7 +60,18 @@ public class SignUpFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onDestroyView() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
@@ -72,7 +84,7 @@ public class SignUpFragment extends Fragment {
                     getActivity().setResult(Activity.RESULT_OK);
                     JSONObject object=new JSONObject();
                     try {
-                        object.put("email",mInputSignupEmail.getText().toString());
+                        object.put("emailAddr",mInputSignupEmail.getText().toString());
                         object.put("userName", HttpUtil.toUTFString(mInputNickname.getText().toString()));
                         object.put("password", mInputSignupPassword.getText().toString());
                     } catch (JSONException e) {
@@ -127,19 +139,19 @@ public class SignUpFragment extends Fragment {
 
     private class SignUp extends AsyncTask<JSONObject, Void, String> {
 
-        private ProgressDialog progressDialog;
+        private String status;
+        private String info;
 
         @Override
         protected String doInBackground(JSONObject... params) {
-            final String[] status = new String[1];
-            final String[] info = new String[1];
+
             HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
                 @Override
                 public void onFinishGetJson(JSONObject jsonObject) {
                     if (jsonObject != null) {
                         try {
-                            status[0] =jsonObject.getString("status");
-                            info[0] = jsonObject.getString("info");
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -154,11 +166,12 @@ public class SignUpFragment extends Fragment {
                 @Override
                 public void onError(Exception e) {
                     Log.e("LoginFrag", e.getMessage());
-                    status[0]="0";
+                    status="0";
                 }
             });
-            if (status[0] != null && info[0] != null) {
-                if (status[0].equals("1") && info[0].equals("ok")) {
+            Log.i("status", "status:" + status + " info:" + info);
+            if (status != null && info != null) {
+                if (status.equals("1") && info.equals("OK")) {
                     return "ok";
                 }
             }
@@ -167,16 +180,16 @@ public class SignUpFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-//            progressDialog = new ProgressDialog(getActivity());
-//            progressDialog.setMessage("正在注册,请稍候...");
-//            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            progressDialog.setCancelable(false);
-//            progressDialog.show();
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("正在注册,请稍候...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
         }
 
         @Override
         protected void onPostExecute(String s) {
-//            progressDialog.dismiss();
+            progressDialog.dismiss();
             if (s.equals("ok")) {
                 Toast.makeText(getActivity(),"注册成功！",Toast.LENGTH_SHORT).show();
                 getActivity().finish();

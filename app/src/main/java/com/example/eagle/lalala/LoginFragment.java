@@ -50,6 +50,7 @@ public class LoginFragment extends Fragment {
     TextView mLinkSignup;
     private static final String TAG = "LoginFragment";
     private static final int REQUEST_SIGNUP = 1;
+    private ProgressDialog progressDialog;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +66,18 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onDestroyView() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
         super.onDestroyView();
         ButterKnife.unbind(this);
     }
@@ -126,7 +138,7 @@ public class LoginFragment extends Fragment {
         }
         JSONObject object = new JSONObject();
         try {
-            object.put("userName", mInputEmail.getText().toString());
+            object.put("emailAddr", mInputEmail.getText().toString());
             object.put("password", mInputPassword.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -170,18 +182,25 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    private class LoginIn extends AsyncTask<JSONObject,Void,JSONObject> {
+    private class LoginIn extends AsyncTask<JSONObject,Void,String> {
 
-        private ProgressDialog progressDialog;
+        private JSONObject object;
+        private String status;
+        private String info;
 
         @Override
-        protected JSONObject doInBackground(JSONObject... params) {
-            final JSONObject[] object = new JSONObject[1];
+        protected String doInBackground(JSONObject... params) {
             HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
                 @Override
                 public void onFinishGetJson(JSONObject jsonObject) {
                     if (jsonObject != null) {
-                        object[0] =jsonObject;
+                        try {
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
+                            object=jsonObject;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -193,11 +212,16 @@ public class LoginFragment extends Fragment {
                 @Override
                 public void onError(Exception e) {
                     Log.e("LoginFrag", e.getMessage());
-                    object[0]=null;
+                    status="0";
                 }
             });
-
-            return object[0];
+            Log.i("status", "status:" + status + " info:" + info);
+            if (status != null && info != null) {
+                if (status.equals("1") && info.equals("OK")) {
+                    return "ok";
+                }
+            }
+            return "no";
         }
 
         @Override
@@ -210,19 +234,12 @@ public class LoginFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(JSONObject s) {
+        protected void onPostExecute(String s) {
             progressDialog.dismiss();
-            try {
-                if (s != null) {
-                    if (s.getString("status").equals("1") && s.getString("info").equals("ok")) {
-                        onLoginSuccess(s.toString());
-                    }else{
-                        onLoginFailed();
-                    }
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
+            if (s.equals("ok")) {
+                onLoginSuccess(object.toString());
+            }else {
+                onLoginFailed();
             }
         }
     }

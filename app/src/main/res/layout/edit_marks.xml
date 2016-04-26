@@ -4,9 +4,19 @@
     android:layout_height="match_parent"
     android:layout_margin="12dp">
 
+    <EditText
+        android:id="@+id/edit_marks_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_mark_name"/>
+    <EditText
+        android:id="@+id/edit_marks_addr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_mark_addr"/>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="150dp">
+        android:layout_height="120dp">
         <EditText
             android:id="@+id/edittext_editmark"
             android:layout_width="match_parent"

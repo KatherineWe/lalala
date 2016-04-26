@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +22,14 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.example.eagle.lalala.NetWork.HttpCallbackListener;
+import com.example.eagle.lalala.NetWork.HttpUtil;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,18 +40,19 @@ import java.util.ArrayList;
  */
 public class Edit_marks_aty extends AppCompatActivity implements View.OnClickListener {
 
-    private static final String serviceUrl="";
+    private static final String serviceUrl="http://119.29.166.177:8080/createMark";
     private static long userId=0;//用户的id
     public static final int PICK_PHOTO=2;
-    private static final int AUTHORITY_PUBLIC=1;
-    private static final int AUTHORITY_PRIVATE=2;
-    private static final int AUTHORITY_SOME=3;
-    private static int AUTHORITY_TYPE=0;
+    private static final int AUTHORITY_PUBLIC=0;
+    private static final int AUTHORITY_PRIVATE=1;
+    private static final int AUTHORITY_SOME=2;
+    private static int AUTHORITY_TYPE=-1;
 
     private String imageCamera;
-    private String location;  //坐标，支持点数据 , 规则：经度,纬度，经纬度支持到小数点后6位 格式示例：104.394729,31.125698
     private ImageButton addPhotoBtn;
     private EditText editMarkContent;
+    private EditText editMarkName;
+    private EditText editMarkAddress;
     private TextView textViewForCoordinate;
     private RadioGroup radioGroup;
     private RadioButton radio_public;
@@ -53,9 +60,9 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
     private RadioButton radio_some;
     private LinearLayout layoutForRadio_some;
     private ProgressDialog progressDialog;
+    private AMapLocationClient mapLocationClient;
 
     private ArrayList<CheckBox> checkBoxArrayList;
-    private ArrayList<String> checkedItem;//被选中的checkbox
 
     public static void actionStart(Context context,String imagePath,long userId){
         Intent intent = new Intent(context, Edit_marks_aty.class);
@@ -79,6 +86,8 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
     private void initView() {
         addPhotoBtn = (ImageButton) findViewById(R.id.imageBtn_editmark);
         editMarkContent= (EditText) findViewById(R.id.edittext_editmark);
+        editMarkName = (EditText) findViewById(R.id.edit_marks_name);
+        editMarkAddress = (EditText) findViewById(R.id.edit_marks_addr);
         textViewForCoordinate= (TextView) findViewById(R.id.tv_position);
         radioGroup= (RadioGroup) findViewById(R.id.radiogroup_editmark);
         radio_public= (RadioButton) findViewById(R.id.radiobtn_public);
@@ -162,36 +171,56 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(userId == 0) {
+        if(userId != 0) {
+            if (imageCamera != null && editMarkName != null && editMarkAddress != null) {
+                JSONObject object = new JSONObject();
+                try {
+                    object.put("userID", userId);           //用户的id
+                    object.put("content", editMarkContent.getText().toString());
+                    object.put("name", editMarkName.getText().toString());
+                    object.put("address", editMarkAddress.getText().toString());
+                    object.put("photo", HandlePicture.bitmapToString(imageCamera));
+                    object.put("location", getLocation());
+                    object.put("authority", AUTHORITY_TYPE);
+                    if (AUTHORITY_TYPE == AUTHORITY_SOME) {
+                        JSONArray array = new JSONArray();
+                        for (CheckBox checkBox : checkBoxArrayList) {
+                            if (checkBox.isChecked()) {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("friendID", checkBox.getText().toString());
+                                jsonObject.put("status", 0);
+                                array.put(jsonObject);
+                            }
+                        }
+                        object.put("checkedItemList", array);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                new UploadMark().execute(object);//用异步处理上传操作
+            } else {
+                Toast.makeText(Edit_marks_aty.this, "请选择要上传的图片或者填写完整信息…", Toast.LENGTH_SHORT).show();
+            }
+        }else{
             Toast.makeText(Edit_marks_aty.this, "请登录...", Toast.LENGTH_SHORT).show();
         }
-        if(imageCamera != null) {
-            JSONObject object = new JSONObject();
-            try {
-                object.put("userId", userId);           //用户的id
-                object.put("content", editMarkContent.getText().toString());
-                object.put("image", HandlePicture.bitmapToString(imageCamera));
-//                object.put("location", location);
-                object.put("authority_type", AUTHORITY_TYPE);
-                if(AUTHORITY_TYPE == AUTHORITY_SOME){
-                    checkedItem=new ArrayList<>();
-                    for (CheckBox checkBox : checkBoxArrayList) {
-                        if(checkBox.isChecked()){
-                            checkedItem.add(checkBox.getText().toString());//将被选中的checkbox的名字存进list
-                        }
-                    }
-                    object.put("authority", checkedItem);
-                } else  {                                   //若只是公开和私密，则不用传权限标签
-                    object.put("authority", AUTHORITY_TYPE);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            new UploadMark().execute(object);//用异步处理上传操作
-        }else{
-            Toast.makeText(Edit_marks_aty.this,"请选择要上传的图片…",Toast.LENGTH_SHORT).show();
-        }
         return true;
+    }
+
+    private String getLocation(){
+//        private String location;  //坐标，支持点数据 , 规则：经度,纬度，经纬度支持到小数点后6位 格式示例：104.394729,31.125698
+        mapLocationClient = new AMapLocationClient(this);
+        AMapLocation aMapLocation = mapLocationClient.getLastKnownLocation();
+        String latitude=aMapLocation.getLatitude()+"";
+        String longtitude=aMapLocation.getLongitude()+",";
+        return longtitude+latitude;
+    }
+    @Override
+    protected void onDestroy() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        super.onDestroy();
     }
 
     @Override
@@ -210,19 +239,19 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
         //向数据库中查找标签表
         checkBoxArrayList=new ArrayList<>();
         CheckBox box1 = new CheckBox(this);
-        box1.setText("朋友");
+        box1.setText("4");
         checkBoxArrayList.add(box1);
         CheckBox box2 = new CheckBox(this);
-        box2.setText("家人");
+        box2.setText("5");
         checkBoxArrayList.add(box2);
         CheckBox box3 = new CheckBox(this);
-        box3.setText("同学");
+        box3.setText("6");
         checkBoxArrayList.add(box3);
         CheckBox box4 = new CheckBox(this);
-        box4.setText("名人");
+        box4.setText("7");
         checkBoxArrayList.add(box4);
         CheckBox box5 = new CheckBox(this);
-        box5.setText("同事");
+        box5.setText("8");
         checkBoxArrayList.add(box5);
 
         //展示出来
@@ -240,37 +269,43 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 
         @Override
         protected String doInBackground(JSONObject... params) {
-            final String[] result = new String[1];
-            result[0] = "done";
-//            HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
-//                @Override
-//                public void onFinishGetJson(JSONObject jsonObject) {
-//                    if (jsonObject != null) {
-//                        try {
-//                            result[0] = jsonObject.getString("result");
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFinishGetString(String response) {
-//
-//                }
-//
-//                @Override
-//                public void onError(Exception e) {
-//                    Log.e("EditMarks", e.getMessage());
-//                    result[0] = "error";
-//                }
-//            });
+            final String[] status = new String[1];
+            final String[] info = new String[1];
+            HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
+                @Override
+                public void onFinishGetJson(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        try {
+                            status[0] =jsonObject.getString("status");
+                            info[0] = jsonObject.getString("info");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFinishGetString(String response) {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("EditMarks", e.getMessage());
+                    status[0]="0";
+                }
+            });
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            return result[0];
+            if (status[0] != null && info[0] != null) {
+                if (status[0].equals("1") && info[0].equals("OK")) {
+                    return "ok";
+                }
+            }
+            return "no";
         }
 
         @Override
@@ -285,12 +320,13 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
         @Override
         protected void onPostExecute(String s) {
             progressDialog.dismiss();
-            if(s.equals("done")) {
+            if(s.equals("ok")) {
                 Toast.makeText(Edit_marks_aty.this, "上传成功", Toast.LENGTH_LONG).show();
+                Edit_marks_aty.this.finish();
             }else {
                 Toast.makeText(Edit_marks_aty.this, "上传失败", Toast.LENGTH_LONG).show();
             }
-            Edit_marks_aty.this.finish();
+
         }
     }
 }
