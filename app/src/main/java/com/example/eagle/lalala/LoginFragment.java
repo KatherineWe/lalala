@@ -1,7 +1,9 @@
 package com.example.eagle.lalala;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,15 @@ import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.MainActivity;
 import com.example.eagle.lalala.Activity.SignUpActivity;
+import com.example.eagle.lalala.NetWork.HttpCallbackListener;
+import com.example.eagle.lalala.NetWork.HttpUtil;
+import com.example.eagle.lalala.PacelForConvey.ConveyJson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,6 +36,9 @@ import butterknife.OnClick;
  * Created by eagle on 2016/4/9.
  */
 public class LoginFragment extends Fragment {
+
+    private static final String serviceUrl="http://119.29.166.177:8080/login";
+    private ConveyJson userJson;  //为了传递json而创立的类
 
     @Bind(R.id.input_login_email)
     EditText mInputEmail;
@@ -68,9 +82,12 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    public void onLoginSuccess() {
+    public void onLoginSuccess(String userString) {
         mBtnLogin.setEnabled(true);
-        startActivity(new Intent(getActivity(),MainActivity.class));
+        userJson = new ConveyJson(userString);
+        Intent startMainAty = new Intent(getActivity(), MainActivity.class);
+        startMainAty.putExtra("userInfo", userJson);
+        startActivity(startMainAty);
     }
 
     public void onLoginFailed() {
@@ -90,8 +107,8 @@ public class LoginFragment extends Fragment {
             mInputEmail.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 6 || password.length() > 10) {
-            mInputPassword.setError("请输入6到10位长的密码");
+        if (password.isEmpty() || password.length() < 6 || password.length() > 18) {
+            mInputPassword.setError("请输入6到18位长的密码");
             valid = false;
         } else {
             mInputPassword.setError(null);
@@ -107,9 +124,17 @@ public class LoginFragment extends Fragment {
             onLoginFailed();
             return;
         }
+        JSONObject object = new JSONObject();
+        try {
+            object.put("userName", mInputEmail.getText().toString());
+            object.put("password", mInputPassword.getText().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        new LoginIn().execute(object);
 
-        mBtnLogin.setEnabled(false);
-        startActivity(new Intent(getActivity(),MainActivity.class));
+//        mBtnLogin.setEnabled(false);
+//        startActivity(new Intent(getActivity(),MainActivity.class));
 
         //此部分后边再补充
 //        final ProgressDialog progressDialog = new ProgressDialog(getActivity(),
@@ -142,6 +167,63 @@ public class LoginFragment extends Fragment {
 
         if(requestCode == REQUEST_SIGNUP){
             Toast.makeText(getActivity(), "请登陆注册邮箱验证完成注册", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class LoginIn extends AsyncTask<JSONObject,Void,JSONObject> {
+
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected JSONObject doInBackground(JSONObject... params) {
+            final JSONObject[] object = new JSONObject[1];
+            HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
+                @Override
+                public void onFinishGetJson(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        object[0] =jsonObject;
+                    }
+                }
+
+                @Override
+                public void onFinishGetString(String response) {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("LoginFrag", e.getMessage());
+                    object[0]=null;
+                }
+            });
+
+            return object[0];
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("正在登陆,请稍候...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject s) {
+            progressDialog.dismiss();
+            try {
+                if (s != null) {
+                    if (s.getString("status").equals("1") && s.getString("info").equals("ok")) {
+                        onLoginSuccess(s.toString());
+                    }else{
+                        onLoginFailed();
+                    }
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

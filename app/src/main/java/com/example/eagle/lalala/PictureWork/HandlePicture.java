@@ -78,7 +78,7 @@ public class HandlePicture  {
         Bitmap bm = decodeSampleBitmapFromPath(filePath,reqWidth,reqHeight);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+        bm.compress(Bitmap.CompressFormat.PNG, 40, baos);
         byte[] b = baos.toByteArray();
 
         return Base64.encodeToString(b, Base64.DEFAULT);
@@ -93,7 +93,7 @@ public class HandlePicture  {
     public static String bitmapToString(Bitmap bitmap) {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 40, baos);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 40, baos);
         byte[] b = baos.toByteArray();
 
         return Base64.encodeToString(b, Base64.DEFAULT);
@@ -187,5 +187,29 @@ public class HandlePicture  {
             return bitmap.getByteCount();
         }
         return bitmap.getRowBytes() * bitmap.getHeight();                //earlier version
+    }
+
+    /**
+     * Bitmap.CompressFormat.JPEG 和 Bitmap.CompressFormat.PNG
+     * JPEG 与 PNG 的是区别在于 JPEG是有损数据图像，PNG使用从LZ77派生的无损数据压缩算法。
+     * 这里建议使用PNG格式保存
+     * 100 表示的是质量为100%。当然，也可以改变成你所需要的百分比质量。
+     * os 是定义的字节输出流
+     *
+     * .compress() 方法是将Bitmap压缩成指定格式和质量的输出流
+     */
+    public static byte[] bitmapTobyte(Bitmap bitmap) {
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, arrayOutputStream);
+        return arrayOutputStream.toByteArray();
+    }
+
+    /**
+     * 根据Bitmap字节数据转换成 Bitmap对象
+     * BitmapFactory.decodeByteArray() 方法对字节数据，从0到字节的长进行解码，生成Bitmap对像。
+     **/
+    public static Bitmap byteToBitmap(byte[] bypes) {
+        Bitmap bmpout = BitmapFactory.decodeByteArray(bypes, 0, bypes.length);
+        return bmpout;
     }
 }

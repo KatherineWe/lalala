@@ -12,7 +12,7 @@
     <string name="repeatPassword">重复密码</string>
     <string name="account">邮箱账号</string>
     <string name="nickname">昵称</string>
-    <string name="receive_email">接收认证邮件</string>
+    <string name="receive_email">确认注册</string>
     <string name="askSignUp">尚无账号？前往注册</string>
     <string name="askLogin">已有账号？前往登陆</string>
     <string name="recyclerview_fab_example">RecyclerView FAB example</string>
@@ -26,4 +26,7 @@
     <string name="radio_some">部分可见</string>
     <string name="edit_sure">确定</string>
     <string name="edit_save">保存</string>
+    <string name="icon_name">头像</string>
+    <string name="signature">个性签名</string>
+    <string name="background">背景图片</string>
 </resources>

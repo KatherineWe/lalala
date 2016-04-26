@@ -63,8 +63,13 @@
         <activity
             android:name=".Activity.ImagePagerActivity"
             android:launchMode="singleTop"
-            android:theme="@android:style/Theme.Black.NoTitleBar"></activity>
+            android:theme="@android:style/Theme.Black.NoTitleBar">
 
+        </activity>
+
+        <service android:name=".Service.WorkWithDatabase"/>
+
+        <activity android:name=".Activity.ModifyUserInfo" android:theme="@style/EditMark"/>
     </application>
 
 </manifest>
