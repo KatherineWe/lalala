@@ -1,9 +1,15 @@
 package com.example.eagle.lalala.Activity;
 
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -18,19 +24,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.eagle.lalala.Edit_marks_aty;
 import com.example.eagle.lalala.Fragment.LoginFragment;
 import com.example.eagle.lalala.Fragment.MapFragment;
+import com.example.eagle.lalala.PacelForConvey.ConveyJson;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.Fragment.SharedFragment;
+import com.example.eagle.lalala.Service.WorkWithDatabase;
 import com.example.neilhy.floatingbutton_library.FloatingActionButton;
 import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 
+import org.json.JSONException;
+
 import java.io.File;
+import java.util.HashMap;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -40,11 +54,14 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO=1;
+    public static long userId=0;//用户的id
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
     @Bind(R.id.textView_title_list)
     TextView mTextViewTitleList;
+    TextView mUserName;
+    ImageView mUserIcon;
     @Bind(R.id.btn_info_in_MainActivity)
     ImageButton mBtnInfoInMainActivity;
     @Bind(R.id.btn_search_in_MainActivity)
@@ -70,6 +87,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Fragment mMapFrgment;
     private Fragment mListFragment;
 
+    private WorkWithDatabase.AccessDatabaseBinder accessDatabaseBinder;//对后台的绑定
+    private ServiceConnection connection;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-
+        saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
 
@@ -90,6 +110,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .hide(mListFragment)
                 .commit();
 
+        RelativeLayout drawerHeaderLayout= (RelativeLayout) mNavigationView.getHeaderView(0);
+        mUserIcon= (ImageView) drawerHeaderLayout.getChildAt(0);//一定要有这种形式得到header的布局元素，不然会报错nullpoint
+        mUserName = (TextView) drawerHeaderLayout.getChildAt(1);
+//        mUserName = (TextView) findViewById(R.id.drawer_header_name);//报错
+//        mUserIcon = (ImageView) findViewById(R.id.drawer_header_icon);
+        mUserIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,ModifyUserInfo.class));
+            }
+        });
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem item) {
@@ -97,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 switch (item.getItemId()) {
                     case R.id.menu_message:
-
+                        Toast.makeText(MainActivity.this,"message",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.menu_favorite:
 
@@ -146,6 +177,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //    protected Fragment creatFragment() {
 //        return mMapFrgment;
 //    }
+    private void setUserIconAndName(String username,String icon){
+        if (icon != null) {
+            Bitmap userIcon=HandlePicture.StringToBitmap(icon);
+            mUserIcon.setImageBitmap(userIcon);
+        }
+        mUserName.setText(username);
+    }
+
+    @Override
+    protected Fragment creatFragment() {
+        return new MapFragment();
+    }
 
     private void takePhoto(){
         imageFile= HandlePicture.createFileForPhoto();//创建图片路径
@@ -195,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         switch (requestCode) {
             case TAKE_PHOTO:
-                    Edit_marks_aty.actionStart(MainActivity.this,imageFile.getAbsolutePath());
+                    Edit_marks_aty.actionStart(MainActivity.this,imageFile.getAbsolutePath(),userId);
                     break;
         }
     }
@@ -206,6 +249,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    private void saveUserInfo(){
+        ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
+        final HashMap<String,Object> userInfo=new HashMap<>();
+        try {
+            String userName=userJson.object.getString("userName");
+            String icon=userJson.object.getString("icon");
+            userId = userJson.object.getLong("userId");
+            setUserIconAndName(userName,icon);//设置navigation上的头像和名称
+
+            userInfo.put("userId",userId);
+            userInfo.put("email", userJson.object.getString("email"));
+            userInfo.put("userName", userName);
+            userInfo.put("password", userJson.object.getString("password"));
+            userInfo.put("icon", icon);
+            userInfo.put("background", userJson.object.getString("background"));
+            userInfo.put("signature", userJson.object.getString("signature"));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        connection=new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
+//                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
+                accessDatabaseBinder.saveUserInfo(MainActivity.this);
+
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+        new saveUserInfos().execute(connection);
+    }
+
+    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
+        @Override
+        protected String doInBackground(ServiceConnection... params) {
+            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
+            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("正在初始化,请稍候...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String str) {
+            progressDialog.dismiss();
+            unbindService(connection);
+            Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
         }
     }
 

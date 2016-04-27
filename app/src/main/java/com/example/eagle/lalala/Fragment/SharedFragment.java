@@ -3,10 +3,12 @@ package com.example.eagle.lalala.Fragment;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,6 +21,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.eagle.lalala.Activity.MainActivity;
+import com.example.eagle.lalala.NetWork.HttpCallbackListener;
+import com.example.eagle.lalala.NetWork.HttpUtil;
+import com.example.eagle.lalala.PDM.BasicEnum.Authorities;
+import com.example.eagle.lalala.PDM.MarksPDM;
+import com.example.eagle.lalala.PDM.commentsPDM;
+import com.example.eagle.lalala.PDM.likesPDM;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.adapter.CircleAdapter;
 import com.example.eagle.lalala.bean.CircleItem;
@@ -35,6 +44,12 @@ import com.example.neilhy.pulltorefresh_lib.PtrFrameLayout;
 import com.example.neilhy.pulltorefresh_lib.PtrHandler;
 import com.example.neilhy.pulltorefresh_lib.header.StoreHouseHeader;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +62,8 @@ import butterknife.OnClick;
  * Created by eagle on 2016/4/9.
  */
 public class SharedFragment extends ListFragment implements  ICircleView {
+
+    private static final String serviceUrl="";
 
     private String[] mStringList={"WeMark Sun.","WeMark Mon.","WeMark Tues.","WeMark Wed.","WeMark Thur.","WeMark Fri.","WeMark Sat."};
 
@@ -70,7 +87,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     @Bind(R.id.sendIv)
     ImageView sendIv;
     @Bind(R.id.editTextBodyLl)
-    LinearLayout mEditTextBody;;
+    LinearLayout mEditTextBody;
     private PtrFrameLayout mPtrFrameLayout;
 
 
@@ -98,7 +115,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         header.setPadding(0,25,0,0);
         header.initWithString(getWeekOfDay());//获得当前星期的字符串
 
-        mPtrFrameLayout.setDurationToCloseHeader(3000);
+        mPtrFrameLayout.setDurationToCloseHeader(2000);
         mPtrFrameLayout.setHeaderView(header);
         mPtrFrameLayout.addPtrUIHandler(header);
 
@@ -124,6 +141,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                         frame.refreshComplete();
                     }
                 }, 2000);
+//                new FreshMarks().execute(frame);
             }
         });
 
@@ -376,4 +394,118 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         mAdapter.notifyDataSetChanged();
     }
 
+
+    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
+        private PtrFrameLayout ptrFrameLayout;
+        private JSONArray jsonArray;
+        @Override
+        protected String doInBackground(PtrFrameLayout... params) {
+            ptrFrameLayout = params[0];
+            final String[] status = new String[1];
+            final String[] info = new String[1];
+            final JSONObject object = new JSONObject();
+            try {
+                object.put("userId", MainActivity.userId);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            HttpUtil.getJsonArrayByHttp(serviceUrl, object, new HttpCallbackListener() {
+                @Override
+                public void onFinishGetJson(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        try {
+                            status[0] =jsonObject.getString("status");
+                            info[0] = jsonObject.getString("info");
+                            jsonArray=jsonObject.getJSONArray("marks");////////////////////////这里是object还是listobject
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onFinishGetString(String response) {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("SharedFrag", e.getMessage());
+                    status[0]="0";
+                }
+            });
+            if (status[0].equals("1") && info[0].equals("ok")) {
+                return "ok";
+            }else {
+                return "no";
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            ptrFrameLayout.refreshComplete();
+            if (s.equals("ok")) {
+                Toast.makeText(getActivity(),"刷新成功！",Toast.LENGTH_SHORT).show();
+                makeMarksList(jsonArray);
+                //loadData();把object里的数据传给这个函数////////////////////////////
+            }else {
+                Toast.makeText(getActivity(),"刷新失败！",Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
+        MarksPDM marksPDM;
+        List<commentsPDM> commentsList=new ArrayList<>();
+        List<likesPDM> likesList=new ArrayList<>();
+        List<MarksPDM> marksList = new ArrayList<>();
+        for(int i=0;i<jsonArray.length();i++) {
+            try {
+                JSONObject marksObject = jsonArray.getJSONObject(i);
+
+                marksPDM = new MarksPDM();
+                marksPDM.setUserId(marksObject.getLong("userID"));
+                marksPDM.setMarkId(marksObject.getLong("markID"));
+                marksPDM.setLbsName(marksObject.getString("positionName"));
+                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
+                marksPDM.setContent(marksObject.getString("content"));
+                marksPDM.setPhoto(marksObject.getString("photo"));
+                marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
+                JSONArray commentsObject = marksObject.getJSONArray("comments");
+                for(int j=0;j<commentsObject.length();j++) {
+                    JSONObject comment = commentsObject.getJSONObject(j);
+
+                    commentsPDM commentsPDM=new commentsPDM();
+                    commentsPDM.setCommentId(comment.getLong("commentId"));
+                    commentsPDM.setMarkId(comment.getLong("markID"));
+                    commentsPDM.setFriendId(comment.getLong("friendID"));
+                    commentsPDM.setFriendName(comment.getString("friendName"));
+                    commentsPDM.setContent(comment.getString("content"));
+                    commentsPDM.setCommentTime((Timestamp) comment.get("commentTime"));
+                    commentsList.add(commentsPDM);
+                }
+                JSONArray likesObject = marksObject.getJSONArray("likes");
+                for (int k=0;k<likesObject.length();k++) {
+                    JSONObject like = likesObject.getJSONObject(k);
+
+                    likesPDM likesPDM = new likesPDM();
+                    likesPDM.setLikeId(like.getLong("likeID"));
+                    likesPDM.setUserId(like.getLong("userID"));
+                    likesPDM.setMarkId(like.getLong("markID"));
+                    likesPDM.setUserName(like.getString("userName"));
+                    likesList.add(likesPDM);
+                }
+                marksPDM.setComments(commentsList);
+                marksPDM.setLikes(likesList);
+                marksList.add(marksPDM);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
