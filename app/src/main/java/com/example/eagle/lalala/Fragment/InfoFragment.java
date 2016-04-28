@@ -22,7 +22,7 @@ public class InfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.frag_info,container,false);
+        View v = inflater.inflate(R.layout.activity_modifyuserinfo,container,false);
         return v;
     }
 }

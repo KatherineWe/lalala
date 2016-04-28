@@ -2,6 +2,7 @@ package com.example.eagle.lalala.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.example.eagle.lalala.utils.PinyinComparator;
 
 import com.example.eagle.lalala.R;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.display.BitmapDisplayer;
 
 import java.util.Collections;
 import java.util.List;
@@ -61,19 +63,15 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		TextView tvCatalog = MyViewHolder.get(convertView,
 				R.id.contactitem_catalog);
 		TextView tvNick = MyViewHolder.get(convertView, R.id.contactitem_nick);
-		char catalog = PingYinUtil.converterToFirstSpell(user.getName())
+		char catalog = PingYinUtil.converterToFirstSpell(user.getName()).substring(0,1).toUpperCase()
 				.charAt(0);
-		if(catalog >= 'a' && catalog <= 'z')
-			catalog -= 32;
 		if (position == 0) {
 			tvCatalog.setVisibility(View.VISIBLE);
 			tvCatalog.setText(String.valueOf(catalog));
 		} else {
 			User Nextuser = UserInfos.get(position - 1);
 			char lastCatalog = PingYinUtil.converterToFirstSpell(
-					Nextuser.getName()).charAt(0);
-			if(lastCatalog >= 'a' && lastCatalog <= 'z')
-				lastCatalog -= 32;
+					Nextuser.getName()).substring(0,1).toUpperCase().charAt(0);
 			if (catalog == lastCatalog) {
 				tvCatalog.setVisibility(View.GONE);
 			} else {
@@ -81,7 +79,6 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 				tvCatalog.setText(String.valueOf(catalog));
 			}
 		}
-
 
 
 
@@ -110,6 +107,8 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 	public int getSectionForPosition(int position) {
 		return 0;
 	}
+
+
 
 	@Override
 	public Object[] getSections() {

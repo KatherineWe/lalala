@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:background="#f6f6f6"
+                android:background="#161616"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp"

@@ -128,6 +128,8 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         User user = DatasUtil.getUsers().get(arg2 - 1);
         Toast.makeText(getActivity(),user.getName(),Toast.LENGTH_SHORT).show();
+
+
 //        if (user != null) {
 //            Intent intent = new Intent(getActivity(), FriendMsgActivity.class);
 //            intent.putExtra(Constants.NAME, user.getUserName());

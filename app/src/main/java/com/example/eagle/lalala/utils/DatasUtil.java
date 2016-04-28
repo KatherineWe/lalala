@@ -69,8 +69,8 @@ public class DatasUtil {
         User user2 = new User("2", "Guan_Suns", HEADIMG[2]);
         User user3 = new User("3", "Katherine", HEADIMG[3]);
         User user4 = new User("4", "hy", HEADIMG[4]);
-        User user5 = new User("5", "赵", HEADIMG[1]);
-        User user6 = new User("6", "钱", HEADIMG[2]);
+        User user5 = new User("5", "Fool", HEADIMG[1]);
+        User user6 = new User("6", "Stupid", HEADIMG[2]);
         User user7 = new User("7", "孙", HEADIMG[3]);
         User user8 = new User("8", "李", HEADIMG[4]);
 
@@ -81,8 +81,8 @@ public class DatasUtil {
         users.add(user4);
         users.add(user5);
         users.add(user6);
-        users.add(user7);
-        users.add(user8);
+//        users.add(user7);
+//        users.add(user8);
 
         mCurrentFragment = "map_frag";
     }
@@ -96,7 +96,6 @@ public class DatasUtil {
     }
 
     public static List<CircleItem> createCircleDatas() {
-       // List<CircleItem> circleDatas = new ArrayList<CircleItem>();
         circleDatas = new ArrayList<CircleItem>();
         for (int i = 0; i < 15; i++) {
             CircleItem item = new CircleItem();
@@ -184,15 +183,15 @@ public class DatasUtil {
         item.setContent("哈哈");
         User user = getUser();
         item.setUser(user);
-        if (getRandomNum(10) % 2 == 0) {
-            while (true) {
-                User replyUser = getUser();
-                if (!user.getId().equals(replyUser.getId())) {
-                    item.setToReplyUser(replyUser);
-                    break;
-                }
-            }
-        }
+//        if (getRandomNum(10) % 2 == 0) {
+//            while (true) {
+//                User replyUser = getUser();
+//                if (!user.getId().equals(replyUser.getId())) {
+//                    item.setToReplyUser(replyUser);
+//                    break;
+//                }
+//            }
+//        }
         return item;
     }
 

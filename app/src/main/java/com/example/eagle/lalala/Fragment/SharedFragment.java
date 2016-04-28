@@ -203,7 +203,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
             }
         });
 
-       // setViewTreeObserver();
+        setViewTreeObserver();
     }
 
     private String getWeekOfDay(){

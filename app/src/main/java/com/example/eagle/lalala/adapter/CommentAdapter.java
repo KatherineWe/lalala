@@ -110,14 +110,14 @@ public class CommentAdapter {
         commentTv.setText(builder);
 
         commentTv.setMovementMethod(circleMovementMethod);
-        commentTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (circleMovementMethod.isPassToTv()) {
-                    mListview.getOnItemClickListener().onItemClick(position);
-                }
-            }
-        });
+//        commentTv.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (circleMovementMethod.isPassToTv()) {
+//                    mListview.getOnItemClickListener().onItemClick(position);
+//                }
+//            }
+//        });
         commentTv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
