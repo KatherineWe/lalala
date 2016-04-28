@@ -13,8 +13,6 @@ import android.os.IBinder;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -30,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eagle.lalala.Edit_marks_aty;
-import com.example.eagle.lalala.Fragment.LoginFragment;
 import com.example.eagle.lalala.Fragment.MapFragment;
 import com.example.eagle.lalala.PacelForConvey.ConveyJson;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
@@ -38,6 +35,7 @@ import com.example.eagle.lalala.PictureWork.TakePicture;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.Fragment.SharedFragment;
 import com.example.eagle.lalala.Service.WorkWithDatabase;
+import com.example.eagle.lalala.utils.CommonUtils;
 import com.example.neilhy.floatingbutton_library.FloatingActionButton;
 import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 
@@ -54,7 +52,7 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO=1;
-    public static long userId=0;//用户的id
+    public static long userId=21;//用户的id
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
@@ -85,7 +83,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private File imageFile;
 
     private Fragment mMapFrgment;
-    private Fragment mListFragment;
+    private Fragment mRecommendedFragment;
+    private Fragment mFocusedFragment;
 
     private WorkWithDatabase.AccessDatabaseBinder accessDatabaseBinder;//对后台的绑定
     private ServiceConnection connection;
@@ -97,24 +96,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-        saveUserInfo();//启用后台获取数据库中用户的数据
+       // saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
 
     private void init() {
         mMapFrgment = new MapFragment();
-        mListFragment = new SharedFragment();
+        mRecommendedFragment = new SharedFragment();
+        mFocusedFragment = new SharedFragment();
+
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.single_frag_container,mListFragment,"list_frag")
+                .add(R.id.single_frag_container,mRecommendedFragment,"recommended_frag")
                 .add(R.id.single_frag_container,mMapFrgment,"map_frag")
-                .hide(mListFragment)
+                //.add(R.id.single_frag_container,mFocusedFragment,"focused_frag")
+                .hide(mRecommendedFragment)
+                // .hide(mFocusedFragment)
                 .commit();
 
         RelativeLayout drawerHeaderLayout= (RelativeLayout) mNavigationView.getHeaderView(0);
-        mUserIcon= (ImageView) drawerHeaderLayout.getChildAt(0);//一定要有这种形式得到header的布局元素，不然会报错nullpoint
+        mUserIcon= (ImageView) drawerHeaderLayout.getChildAt(0);
         mUserName = (TextView) drawerHeaderLayout.getChildAt(1);
-//        mUserName = (TextView) findViewById(R.id.drawer_header_name);//报错
-//        mUserIcon = (ImageView) findViewById(R.id.drawer_header_icon);
         mUserIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,10 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TakePicture.createCustomAnimation(menuButton);//设置点击按钮后的动画，星星变叉
     }
 
-//    @Override
-//    protected Fragment creatFragment() {
-//        return mMapFrgment;
-//    }
+
     private void setUserIconAndName(String username,String icon){
         if (icon != null) {
             Bitmap userIcon=HandlePicture.StringToBitmap(icon);
@@ -185,10 +183,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mUserName.setText(username);
     }
 
-    @Override
-    protected Fragment creatFragment() {
-        return new MapFragment();
-    }
+
 
     private void takePhoto(){
         imageFile= HandlePicture.createFileForPhoto();//创建图片路径
@@ -201,11 +196,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.textView_title_map:
-                changeFrag(mListFragment,mMapFrgment);
+                CommonUtils.changeFrag(MainActivity.this,mRecommendedFragment,mMapFrgment);
                 //changeFrag(getSupportFragmentManager().findFragmentByTag("list_frag"),getSupportFragmentManager().findFragmentByTag("map_frag"));
                 break;
             case R.id.textView_title_list:
-                changeFrag(mMapFrgment,mListFragment);
+                CommonUtils.changeFrag(MainActivity.this,mMapFrgment,mRecommendedFragment);
                 //changeFrag(getSupportFragmentManager().findFragmentByTag("map_frag"),getSupportFragmentManager().findFragmentByTag("list_frag"));
                 break;
             case R.id.btn_info_in_MainActivity:
@@ -224,13 +219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuButton.close(true);
     }
 
-    private void changeFrag(Fragment from,Fragment to) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        if(!to.isAdded())
-            transaction.hide(from).add(R.id.single_frag_container, to).commit();
-        else
-            transaction.hide(from).show(to).commit();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -252,71 +240,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void saveUserInfo(){
-        ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
-        final HashMap<String,Object> userInfo=new HashMap<>();
-        try {
-            String userName=userJson.object.getString("userName");
-            String icon=userJson.object.getString("icon");
-            userId = userJson.object.getLong("userId");
-            setUserIconAndName(userName,icon);//设置navigation上的头像和名称
-
-            userInfo.put("userId",userId);
-            userInfo.put("email", userJson.object.getString("email"));
-            userInfo.put("userName", userName);
-            userInfo.put("password", userJson.object.getString("password"));
-            userInfo.put("icon", icon);
-            userInfo.put("background", userJson.object.getString("background"));
-            userInfo.put("signature", userJson.object.getString("signature"));
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        connection=new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
-//                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
-                accessDatabaseBinder.saveUserInfo(MainActivity.this);
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
-        new saveUserInfos().execute(connection);
-    }
-
-    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
-        @Override
-        protected String doInBackground(ServiceConnection... params) {
-            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
-            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage("正在初始化,请稍候...");
-            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(String str) {
-            progressDialog.dismiss();
-            unbindService(connection);
-            Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
-        }
-    }
+//    private void saveUserInfo(){
+//        ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
+//        final HashMap<String,Object> userInfo=new HashMap<>();
+//        try {
+//            String userName=userJson.object.getString("userName");
+//            String icon=userJson.object.getString("icon");
+//            userId = userJson.object.getLong("userId");
+//            setUserIconAndName(userName,icon);//设置navigation上的头像和名称
+//
+//            userInfo.put("userId",userId);
+//            userInfo.put("email", userJson.object.getString("email"));
+//            userInfo.put("userName", userName);
+//            userInfo.put("password", userJson.object.getString("password"));
+//            userInfo.put("icon", icon);
+//            userInfo.put("background", userJson.object.getString("background"));
+//            userInfo.put("signature", userJson.object.getString("signature"));
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        connection=new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
+////                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
+//                accessDatabaseBinder.saveUserInfo(MainActivity.this);
+//
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//
+//            }
+//        };
+//        new saveUserInfos().execute(connection);
+//    }
+//
+//    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
+//        @Override
+//        protected String doInBackground(ServiceConnection... params) {
+//            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
+//            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//            progressDialog = new ProgressDialog(MainActivity.this);
+//            progressDialog.setMessage("正在初始化,请稍候...");
+//            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//            progressDialog.setCancelable(false);
+//            progressDialog.show();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String str) {
+//            progressDialog.dismiss();
+//            unbindService(connection);
+//            Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
+//        }
+//    }
 
 }

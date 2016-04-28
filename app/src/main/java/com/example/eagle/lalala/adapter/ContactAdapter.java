@@ -16,6 +16,8 @@ import com.example.eagle.lalala.utils.PingYinUtil;
 import com.example.eagle.lalala.utils.PinyinComparator;
 
 import com.example.eagle.lalala.R;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -58,24 +60,30 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 		TextView tvCatalog = MyViewHolder.get(convertView,
 				R.id.contactitem_catalog);
 		TextView tvNick = MyViewHolder.get(convertView, R.id.contactitem_nick);
-		String catalog = PingYinUtil.converterToFirstSpell(user.getName())
-				.substring(0, 1);
+		char catalog = PingYinUtil.converterToFirstSpell(user.getName())
+				.charAt(0);
+		if(catalog >= 'a' && catalog <= 'z')
+			catalog -= 32;
 		if (position == 0) {
 			tvCatalog.setVisibility(View.VISIBLE);
-			tvCatalog.setText(catalog);
+			tvCatalog.setText(String.valueOf(catalog));
 		} else {
 			User Nextuser = UserInfos.get(position - 1);
-			String lastCatalog = PingYinUtil.converterToFirstSpell(
-					Nextuser.getName()).substring(0, 1);
-			if (catalog.equals(lastCatalog)) {
+			char lastCatalog = PingYinUtil.converterToFirstSpell(
+					Nextuser.getName()).charAt(0);
+			if(lastCatalog >= 'a' && lastCatalog <= 'z')
+				lastCatalog -= 32;
+			if (catalog == lastCatalog) {
 				tvCatalog.setVisibility(View.GONE);
 			} else {
 				tvCatalog.setVisibility(View.VISIBLE);
-				tvCatalog.setText(catalog);
+				tvCatalog.setText(String.valueOf(catalog));
 			}
 		}
 
-		ivAvatar.setImageResource(R.drawable.head);
+		ImageLoader.getInstance().displayImage(user.getHeadUrl(),ivAvatar);
+//		ivAvatar.setImageURI(user.getHeadUrl());
+//		ivAvatar.setImageResource(R.drawable.head);
 		tvNick.setText(user.getName());
 		return convertView;
 	}

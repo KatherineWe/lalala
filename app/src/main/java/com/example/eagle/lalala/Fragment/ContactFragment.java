@@ -27,7 +27,7 @@ import com.example.eagle.lalala.widgets.SideBar;
 public class ContactFragment extends Fragment implements View.OnClickListener,
         AdapterView.OnItemClickListener {
 
-    private View layout;
+    private View layout,layout_head;
     private ListView lvContact;
     private SideBar indexBar;
     private TextView mDialogText;
@@ -75,6 +75,9 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
                 PixelFormat.TRANSLUCENT);
         mWindowManager.addView(mDialogText, lp);
         indexBar.setTextView(mDialogText);
+        layout_head = getActivity().getLayoutInflater().inflate(
+                R.layout.layout_head_friend, null);
+        lvContact.addHeaderView(layout_head);
 
     }
 
@@ -122,6 +125,12 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
 
+            case R.id.layout_addfriend:// 添加好友
+                //Utils.start_Activity(getActivity(), NewFriendsListActivity.class);
+                break;
+
+            default:
+                break;
         }
     }
 

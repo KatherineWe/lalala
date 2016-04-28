@@ -20,7 +20,7 @@ public class SideBar extends View {
 	private SectionIndexer sectionIndexter = null;
 	private ListView list;
 	private TextView mDialogText;
-	private int m_nItemHeight = DensityUtil.dipToPixel(getContext(), 15);
+	private int m_nItemHeight = DensityUtil.dipToPixel(getContext(), 19);
 
 	public SideBar(Context context) {
 		super(context);
@@ -83,7 +83,7 @@ public class SideBar extends View {
 	protected void onDraw(Canvas canvas) {
 		Paint paint = new Paint();
 		paint.setColor(getResources().getColor(R.color.gray));
-		paint.setTextSize(DensityUtil.dipToPixel(getContext(), 12));
+		paint.setTextSize(DensityUtil.dipToPixel(getContext(), 13));
 		// paint.setTextSize(20);
 		// paint.setColor(0xff595c61);
 		Typeface font = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);

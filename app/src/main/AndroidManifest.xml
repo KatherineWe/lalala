@@ -35,10 +35,17 @@
             android:value="a7c433c1fc6b7d36fefd01f861b819ea" />
 
         <activity android:name=".Activity.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
 
 
         <activity android:name=".Activity.MainActivity">
+
+
 
         </activity>
 
@@ -64,13 +71,10 @@
             android:theme="@style/AppTheme">
 
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
 
         </activity>
+
+
         <service android:name=".Service.WorkWithDatabase"/>
 
         <activity android:name=".Activity.ModifyUserInfo" android:theme="@style/EditMark"/>

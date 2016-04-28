@@ -20,6 +20,7 @@
     <string name="navigation_drawer_open">Navigation open</string>
     <string name="navigation_drawer_close">Navigation close</string>
     <string name="image_btn_add">添加照片</string>
+    <string name="add_friend">添加朋友</string>
     <string name="edit_mark_name">填写Mark名称</string>
     <string name="edit_mark_addr">填写Mark地址</string>
     <string name="hint_edit">记录下坐标的信息…</string>

@@ -22,7 +22,7 @@
             android:id="@+id/login_iv"
             android:layout_width="wrap_content"
             android:layout_height="72dp"
-            android:src="@drawable/user_icon2"
+            android:src="@drawable/ic_search"
             android:layout_marginBottom="24dp"
             android:layout_gravity="center_horizontal" />
 

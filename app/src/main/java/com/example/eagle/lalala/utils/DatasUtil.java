@@ -73,6 +73,10 @@ public class DatasUtil {
         users.add(user2);
         users.add(user3);
         users.add(user4);
+        users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","baa",HEADIMG[4]));users.add(new User("5","caa",HEADIMG[4]));
+        users.add(new User("5","daa",HEADIMG[4]));users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","王aa",HEADIMG[4]));
+        users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","haa",HEADIMG[4]));users.add(new User("5","21aa",HEADIMG[4]));
+        users.add(new User("5","傻货aa",HEADIMG[4]));users.add(new User("5","zaa",HEADIMG[4]));users.add(new User("5","aaa",HEADIMG[4]));
     }
 
     public static List<CircleItem> getCircleDatas() {

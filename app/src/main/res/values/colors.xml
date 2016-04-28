@@ -25,6 +25,7 @@
     <color name="gary">#333333</color>
     <color name="gray_lite">#c5c5c5</color>
     <color name="black2">#ffeeeeee</color>
+    <color name="black1">#7A7E83</color>
     <color name="itemlist">#f4f4f4</color>
     <color name="watermark_hint">#ccffffff</color>
     <color name="act_background">#efefef</color>

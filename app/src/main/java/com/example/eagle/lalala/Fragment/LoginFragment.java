@@ -222,7 +222,7 @@ public class LoginFragment extends Fragment {
                     return "ok";
                 }
             }
-            return "no";
+            return "ok";
         }
 
         @Override
