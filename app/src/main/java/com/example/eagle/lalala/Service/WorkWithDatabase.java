@@ -84,12 +84,13 @@ public class WorkWithDatabase extends Service {
 
         public void upDateUserInfo(Context context, final HashMap<String, Object> userInfo) {
             databaseHelper = new WeMarkDatabaseHelper(context, "WeMark.db", null, 1);
-            final SQLiteDatabase db=databaseHelper.getWritableDatabase();
-            db.beginTransaction();
-            try {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+            final SQLiteDatabase db = databaseHelper.getWritableDatabase();
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    db.beginTransaction();
+                    try {
                         ContentValues values = new ContentValues();
                         boolean flag = false;
                         if ((long) userInfo.get("userId") != 0) {
@@ -108,30 +109,29 @@ public class WorkWithDatabase extends Service {
                         if (userInfo.get("icon") != null && !userInfo.get("icon").toString().equals("")) {
 //                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("icon").toString());
 //                            values.put(WeMarkDatabaseHelper.ICON, HandlePicture.bitmapTobyte(bitmap));
-                            values.put(WeMarkDatabaseHelper.ICON,userInfo.get("icon").toString());
+                            values.put(WeMarkDatabaseHelper.ICON, userInfo.get("icon").toString());
                         }
                         if (userInfo.get("background") != null && !userInfo.get("background").toString().equals("")) {
 //                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("background").toString());
 //                            values.put(WeMarkDatabaseHelper.BACKGROUND, HandlePicture.bitmapTobyte(bitmap));
-                            values.put(WeMarkDatabaseHelper.BACKGROUND,userInfo.get("background").toString());
+                            values.put(WeMarkDatabaseHelper.BACKGROUND, userInfo.get("background").toString());
                         }
                         if (userInfo.get("signature") != null) {
                             values.put(WeMarkDatabaseHelper.SIGNATURE, userInfo.get("signature").toString());
                         }
                         if (flag) {
-                            db.update(WeMarkDatabaseHelper.USER_TABLE, values,"userId="+userInfo.get("userId"),null);
+                            db.update(WeMarkDatabaseHelper.USER_TABLE, values, "userId=" + userInfo.get("userId"), null);
                         }
                         db.setTransactionSuccessful();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        db.endTransaction();
                     }
-                }).start();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }finally {
-                db.endTransaction();
-            }
+                }
+            }).start();
+
         }
-
-
     }
 
     @Nullable

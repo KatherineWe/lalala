@@ -54,13 +54,15 @@ public class LoginFragment extends Fragment {
     private static final String TAG = "LoginFragment";
     private static final int REQUEST_SIGNUP = 1;
     private ProgressDialog progressDialog;
+    private JSONObject newJsonObject;
 
     private Handler handler = new Handler(){
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
 //                    Log.i("status4","jsonInHandler:::"+ msg.obj.toString());
-                    onLoginSuccess((JSONObject) msg.obj);
+//                    onLoginSuccess((JSONObject) msg.obj);
+                    onLoginSuccess(newJsonObject);
                     break;
                 case -1:
                     onLoginFailed();
@@ -214,7 +216,10 @@ public class LoginFragment extends Fragment {
                         try {
                             status =jsonObject.getString("status");
                             info = jsonObject.getString("info");
-                            object=jsonObject;
+//                            object=jsonObject;
+                            newJsonObject=jsonObject;
+                            Log.i("Modify_info:::","login:::"+ jsonObject.get("icon").toString());
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

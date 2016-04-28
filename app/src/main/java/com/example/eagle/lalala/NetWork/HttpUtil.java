@@ -139,4 +139,37 @@ public class HttpUtil  {
         return text;
     }
 
+    public static String toGBK_UTFString(String str) {
+        //转换字符
+        String text="";
+        //判断要转码的字符串是否有效
+        if (str != null & !"".equals(str)) {
+            try {
+                //将字符串进行编码处理
+                text = new String(str.getBytes("GBK"), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        //返回后的字符串
+        return text;
+    }
+
+    public static String toGb2312_UTFString(String str) {
+        //转换字符
+        String text=null;
+        //判断要转码的字符串是否有效
+        if (str != null & !"".equals(str)) {
+            try {
+                //将字符串进行编码处理
+                byte[] bytes=str.getBytes();
+                text = new String(bytes, "gb2312");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        //返回后的字符串
+        return text;
+    }
+
 }

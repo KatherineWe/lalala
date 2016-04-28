@@ -339,8 +339,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             userInfo.put("email", userJson.object.getString("emailAddr"));
             userInfo.put("userName", userName);
             userInfo.put("password", userJson.object.getString("password"));
-            userInfo.put("icon", iconFile.getAbsolutePath());
-            userInfo.put("background", backgroundFile.getAbsolutePath());
+            if (iconFile != null) {
+                userInfo.put("icon", iconFile.getAbsolutePath());
+            }
+            if (backgroundFile != null) {
+                userInfo.put("background", backgroundFile.getAbsolutePath());
+            }
             userInfo.put("signature", userJson.object.getString("signature"));
 
         } catch (JSONException e) {

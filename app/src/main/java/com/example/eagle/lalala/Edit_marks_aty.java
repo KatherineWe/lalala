@@ -191,16 +191,17 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(userId != 0) {
-            if (imageCamera != null && editMarkName != null && editMarkAddress != null) {
+            if (imageCamera != null && !editMarkName.getText().toString().equals("") && !editMarkAddress.getText().toString().equals("") ) {
                 JSONObject object = new JSONObject();
                 try {
-                    object.put("userID", userId);           //用户的id
+                    object.put("userID", userId+"");           //用户的id
                     object.put("content", editMarkContent.getText().toString());
                     object.put("name", editMarkName.getText().toString());
                     object.put("address", editMarkAddress.getText().toString());
-                    object.put("photo", HandlePicture.bitmapToString(imageCamera));
+//                    object.put("photo", HandlePicture.bitmapToString(imageCamera));
+                    object.put("photo", "asdfasdifjaonsdlfkajoidsgfanlksenfalsdhgfoiadshgnlasjdnbgf");
                     object.put("location", getLocation());
-                    object.put("authority", AUTHORITY_TYPE);
+                    object.put("authority", AUTHORITY_TYPE+"");
                     if (AUTHORITY_TYPE == AUTHORITY_SOME) {
                         JSONArray array = new JSONArray();
                         for (CheckBox checkBox : checkBoxArrayList) {
@@ -213,6 +214,14 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                         }
                         object.put("checkedItemList", array);
                     }
+                    object.put("checkedItemList", null);
+                    Log.i("Edit_json:::", object.toString());////////////测试输出
+                    Log.i("Edit_json:::address:::", object.get("address").toString());
+                    Log.i("Edit_json:::address:::", editMarkAddress.getText().toString());
+                    Log.i("Edit_json:::address:::", HttpUtil.toUTFString(object.get("address").toString()));
+                    Log.i("Edit_json:::photo:", object.get("photo").toString());
+                    Log.i("Edit_json:::name:::", object.get("name").toString());
+                    Log.i("Edit_json:::authority:", object.get("authority").toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -232,8 +241,8 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 //        AMapLocation aMapLocation = mapLocationClient.getLastKnownLocation();
 //        String latitude=aMapLocation.getLatitude()+"";
 //        String longtitude=aMapLocation.getLongitude()+",";\
-        String longtitude=123.123123+",";
-        String latitude=123.123123+"";
+        String longtitude=23.1231232+",";
+        String latitude=67.123123+"";
         return longtitude+latitude;
     }
     @Override
