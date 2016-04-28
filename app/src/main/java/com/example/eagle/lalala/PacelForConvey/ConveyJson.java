@@ -28,11 +28,15 @@ public class ConveyJson implements Parcelable {
     };
 
     public ConveyJson(String str) {
-        try {
+        try{
             object = new JSONObject(str);
-        } catch (JSONException e) {
+        }catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public ConveyJson(JSONObject object) {
+            this.object = object;
     }
 
     @Override

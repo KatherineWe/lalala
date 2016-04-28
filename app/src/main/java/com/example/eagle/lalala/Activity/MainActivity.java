@@ -4,7 +4,10 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +30,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
 import com.example.eagle.lalala.Edit_marks_aty;
 import com.example.eagle.lalala.Fragment.MapFragment;
 import com.example.eagle.lalala.PacelForConvey.ConveyJson;
@@ -42,6 +47,9 @@ import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 
 import butterknife.Bind;
@@ -52,7 +60,9 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int TAKE_PHOTO=1;
-    public static long userId=21;//用户的id
+    public static long userId=0;//用户的id
+    public static File iconFile;
+    public static File backgroundFile;
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
@@ -96,9 +106,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-       // saveUserInfo();//启用后台获取数据库中用户的数据
+        saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        takeUserIconAndName();
+    }
 
     private void init() {
         mMapFrgment = new MapFragment();
@@ -169,18 +184,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 menuButton.showMenuButton(true);
             }
-        },800);//让这个按钮800毫秒之后显示出来
+        },500);//让这个按钮500毫秒之后显示出来
 
         TakePicture.createCustomAnimation(menuButton);//设置点击按钮后的动画，星星变叉
     }
 
-
-    private void setUserIconAndName(String username,String icon){
-        if (icon != null) {
-            Bitmap userIcon=HandlePicture.StringToBitmap(icon);
-            mUserIcon.setImageBitmap(userIcon);
+    private void saveUserIcon(String icon) {
+        if (icon != null && !icon.equals("")) {
+            iconFile=HandlePicture.createFileForIcon();
+            Bitmap bitmap = HandlePicture.StringToBitmap(icon);
+            try {
+                FileOutputStream out = new FileOutputStream(iconFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
-        mUserName.setText(username);
+    }
+
+    private void saveUserBackground(String background) {
+        if (background != null && !background.equals("")) {
+            backgroundFile=HandlePicture.createFileForBackground();
+            Bitmap bitmap = HandlePicture.StringToBitmap(background);
+            try {
+                FileOutputStream out = new FileOutputStream(backgroundFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void takeUserIconAndName() {
+        WeMarkDatabaseHelper helper = new WeMarkDatabaseHelper(MainActivity.this, "WeMark.db", null, 1);
+        SQLiteDatabase db=helper.getReadableDatabase();
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.query(WeMarkDatabaseHelper.USER_TABLE, null, "userId=" + userId, null, null, null, null);
+            if (cursor.moveToFirst()) {
+                do {
+                    if (cursor.getString(cursor.getColumnIndex("userName")) != null && !cursor.getString(cursor.getColumnIndex("userName")).equals("")) {
+                        mUserName.setText(cursor.getString(cursor.getColumnIndex("userName")));
+                    }
+                    if (cursor.getString(cursor.getColumnIndex("icon")) != null && !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
+
+                        mUserIcon.setImageBitmap(BitmapFactory.decodeFile( cursor.getString(cursor.getColumnIndex("icon")) ));
+                    }
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            db.endTransaction();
+        }
     }
 
 
@@ -232,6 +295,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onDestroy() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public void onBackPressed() {
         if (mDrawerLayout != null && mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -240,71 +311,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    private void saveUserInfo(){
-//        ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
-//        final HashMap<String,Object> userInfo=new HashMap<>();
-//        try {
-//            String userName=userJson.object.getString("userName");
-//            String icon=userJson.object.getString("icon");
-//            userId = userJson.object.getLong("userId");
-//            setUserIconAndName(userName,icon);//设置navigation上的头像和名称
-//
-//            userInfo.put("userId",userId);
-//            userInfo.put("email", userJson.object.getString("email"));
-//            userInfo.put("userName", userName);
-//            userInfo.put("password", userJson.object.getString("password"));
-//            userInfo.put("icon", icon);
-//            userInfo.put("background", userJson.object.getString("background"));
-//            userInfo.put("signature", userJson.object.getString("signature"));
-//
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        connection=new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName name, IBinder service) {
-//                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
-////                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
+    private void saveUserInfo(){
+        ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
+        final HashMap<String,Object> userInfo=new HashMap<>();
+        try {
+            String userName=userJson.object.getString("userName");
+            String icon=userJson.object.getString("icon");
+            String background = userJson.object.getString("background");
+            userId = userJson.object.getLong("userID");
+            saveUserIcon(icon);
+            saveUserBackground(background);
+
+            userInfo.put("userId",userId);
+            userInfo.put("email", userJson.object.getString("emailAddr"));
+            userInfo.put("userName", userName);
+            userInfo.put("password", userJson.object.getString("password"));
+            userInfo.put("icon", iconFile.getAbsolutePath());
+            userInfo.put("background", backgroundFile.getAbsolutePath());
+            userInfo.put("signature", userJson.object.getString("signature"));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        connection=new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
+                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
 //                accessDatabaseBinder.saveUserInfo(MainActivity.this);
-//
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName name) {
-//
-//            }
-//        };
-//        new saveUserInfos().execute(connection);
-//    }
-//
-//    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
-//        @Override
-//        protected String doInBackground(ServiceConnection... params) {
-//            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
-//            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
-//            try {
-//                Thread.sleep(1000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            progressDialog = new ProgressDialog(MainActivity.this);
-//            progressDialog.setMessage("正在初始化,请稍候...");
-//            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            progressDialog.setCancelable(false);
-//            progressDialog.show();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String str) {
-//            progressDialog.dismiss();
-//            unbindService(connection);
-//            Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
-//        }
-//    }
+
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+        new saveUserInfos().execute(connection);
+    }
+
+    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
+        @Override
+        protected String doInBackground(ServiceConnection... params) {
+            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
+            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("正在初始化,请稍候...");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String str) {
+            progressDialog.dismiss();
+            unbindService(connection);
+            Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
+        }
+    }
 
 }

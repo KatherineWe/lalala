@@ -44,18 +44,18 @@ public class WeMarkDatabaseHelper extends SQLiteOpenHelper {
             +USER_NAME+" varchar(255), "
             +PASSWORD+" varchar(255), "
             +SIGNATURE+" text, "
-            +ICON+" blob, "
-            +BACKGROUND+" blob)";
+            +ICON+" varchar(255), "
+            +BACKGROUND+" varchar(255))";
 
     public static final String CREATE_FRIEND_TABLE="create table "+FRIENDS_TABLE+" ("
             +FRIEND_ID+" integer(8) primary key, "
             +FRIEND_NAME+" varchar(255), "
-            +FRIEND_ICON+" blob)";
+            +FRIEND_ICON+" varchar(255))";
 
     public static final String CREATE_MARKS_TABLE="create table "+MARKS_TABLE+" ("
             +MARK_ID+" integer(8) primary key, "
             +MARK_CONTENT+" text,"
-            +MARK_PHOTO+" blob)";
+            +MARK_PHOTO+" varchar(255))";
 
     public static final String CREATE_AUTHORITY_TABLE="create table "+AUTHORITY_TABLE+" ("
             +AUTHORITY_ID+" integer(8) primary key, "
@@ -73,7 +73,6 @@ public class WeMarkDatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_FRIEND_TABLE);
         db.execSQL(CREATE_MARKS_TABLE);
         db.execSQL(CREATE_AUTHORITY_TABLE);
-        Toast.makeText(mContext,"ok",Toast.LENGTH_SHORT).show();
     }
 
     @Override

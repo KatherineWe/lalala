@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
+import com.example.eagle.lalala.Activity.MainActivity;
 import com.example.eagle.lalala.NetWork.HttpCallbackListener;
 import com.example.eagle.lalala.NetWork.HttpUtil;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
@@ -41,12 +44,12 @@ import java.util.ArrayList;
 public class Edit_marks_aty extends AppCompatActivity implements View.OnClickListener {
 
     private static final String serviceUrl="http://119.29.166.177:8080/createMark";
-    private static long userId=0;//用户的id
+    private static long userId= MainActivity.userId;//用户的id
     public static final int PICK_PHOTO=2;
     private static final int AUTHORITY_PUBLIC=0;
     private static final int AUTHORITY_PRIVATE=1;
     private static final int AUTHORITY_SOME=2;
-    private static int AUTHORITY_TYPE=-1;
+    private static int AUTHORITY_TYPE=AUTHORITY_PUBLIC;
 
     private String imageCamera;
     private ImageButton addPhotoBtn;
@@ -61,6 +64,22 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
     private LinearLayout layoutForRadio_some;
     private ProgressDialog progressDialog;
     private AMapLocationClient mapLocationClient;
+
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    progressDialog.dismiss();
+                    Toast.makeText(Edit_marks_aty.this,"上传成功！",Toast.LENGTH_SHORT).show();
+                    finish();
+                    break;
+                case -1:
+                    progressDialog.dismiss();
+                    Toast.makeText(Edit_marks_aty.this,"上传失败！",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     private ArrayList<CheckBox> checkBoxArrayList;
 
@@ -77,7 +96,6 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.edit_marks);
 
         initView();//初始化所有控件
-        userId = getIntent().getLongExtra("userId",0);
         compressPhoto(getIntent());//压缩按钮上的图片
 
 
@@ -121,6 +139,7 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                 }
             }
         });
+        textViewForCoordinate.setText(getLocation());
     }
 
     private void compressPhoto(Intent intent){
@@ -129,7 +148,7 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
             Bitmap bitmap2 = null;
 //            try {
 //                bitmap1 = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-            bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 180, 380);
+            bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 180, 360);
 
             addPhotoBtn.setImageBitmap(bitmap2);
 //            } catch (FileNotFoundException e) {
@@ -209,10 +228,12 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 
     private String getLocation(){
 //        private String location;  //坐标，支持点数据 , 规则：经度,纬度，经纬度支持到小数点后6位 格式示例：104.394729,31.125698
-        mapLocationClient = new AMapLocationClient(this);
-        AMapLocation aMapLocation = mapLocationClient.getLastKnownLocation();
-        String latitude=aMapLocation.getLatitude()+"";
-        String longtitude=aMapLocation.getLongitude()+",";
+//        mapLocationClient = new AMapLocationClient(this);
+//        AMapLocation aMapLocation = mapLocationClient.getLastKnownLocation();
+//        String latitude=aMapLocation.getLatitude()+"";
+//        String longtitude=aMapLocation.getLongitude()+",";\
+        String longtitude=123.123123+",";
+        String latitude=123.123123+"";
         return longtitude+latitude;
     }
     @Override
@@ -239,13 +260,13 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
         //向数据库中查找标签表
         checkBoxArrayList=new ArrayList<>();
         CheckBox box1 = new CheckBox(this);
-        box1.setText("4");
+        box1.setText("10");
         checkBoxArrayList.add(box1);
         CheckBox box2 = new CheckBox(this);
-        box2.setText("5");
+        box2.setText("11");
         checkBoxArrayList.add(box2);
         CheckBox box3 = new CheckBox(this);
-        box3.setText("6");
+        box3.setText("12");
         checkBoxArrayList.add(box3);
         CheckBox box4 = new CheckBox(this);
         box4.setText("7");
@@ -266,22 +287,29 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 
     //上传的异步类
     private class UploadMark extends AsyncTask<JSONObject,Void,String> {
-
+        private String status;
+        private String info;
         @Override
         protected String doInBackground(JSONObject... params) {
-            final String[] status = new String[1];
-            final String[] info = new String[1];
+
             HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
                 @Override
                 public void onFinishGetJson(JSONObject jsonObject) {
                     if (jsonObject != null) {
                         try {
-                            status[0] =jsonObject.getString("status");
-                            info[0] = jsonObject.getString("info");
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
                 }
 
                 @Override
@@ -292,20 +320,15 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void onError(Exception e) {
                     Log.e("EditMarks", e.getMessage());
-                    status[0]="0";
+                    status="0";
                 }
             });
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (status[0] != null && info[0] != null) {
-                if (status[0].equals("1") && info[0].equals("OK")) {
-                    return "ok";
-                }
-            }
-            return "no";
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+            return null;
         }
 
         @Override
@@ -319,13 +342,6 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
 
         @Override
         protected void onPostExecute(String s) {
-            progressDialog.dismiss();
-            if(s.equals("ok")) {
-                Toast.makeText(Edit_marks_aty.this, "上传成功", Toast.LENGTH_LONG).show();
-                Edit_marks_aty.this.finish();
-            }else {
-                Toast.makeText(Edit_marks_aty.this, "上传失败", Toast.LENGTH_LONG).show();
-            }
 
         }
     }

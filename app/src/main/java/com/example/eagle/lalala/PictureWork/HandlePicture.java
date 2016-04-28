@@ -174,6 +174,68 @@ public class HandlePicture  {
         return filex;
     }
 
+    public static File createFileForBackground() {
+        boolean SDcardExist= Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+        File outputImage = null;
+        if(SDcardExist == true) { //如果有SD卡
+            outputImage= new File(Environment.getExternalStorageDirectory(), FILENAME);
+        }else{//如果没有SD卡，则在系统根目录下创建文件
+            outputImage=new File(Environment.getRootDirectory(),FILENAME);
+        }
+        if (!outputImage.exists()) {//如果文件不存在
+            outputImage.mkdir();//新建文件夹
+        }
+//        Random random = new Random(System.currentTimeMillis());//随机生成照片id
+//        int imageId=Math.abs(random.nextInt())%10000;
+
+        File filex=null;
+        if(outputImage.isDirectory()){
+            String path=outputImage.getAbsolutePath();
+            filex=new File(path, "background.png");
+            try {
+                if (filex.exists()) {//如果文件存在
+                    filex.delete();
+                }
+                filex.createNewFile();//新建文件
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return filex;
+    }
+
+    public static File createFileForIcon() {
+        boolean SDcardExist= Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+        File outputImage = null;
+        if(SDcardExist == true) { //如果有SD卡
+            outputImage= new File(Environment.getExternalStorageDirectory(), FILENAME);
+        }else{//如果没有SD卡，则在系统根目录下创建文件
+            outputImage=new File(Environment.getRootDirectory(),FILENAME);
+        }
+        if (!outputImage.exists()) {//如果文件不存在
+            outputImage.mkdir();//新建文件夹
+        }
+//        Random random = new Random(System.currentTimeMillis());//随机生成照片id
+//        int imageId=Math.abs(random.nextInt())%10000;
+
+        File filex=null;
+        if(outputImage.isDirectory()){
+            String path=outputImage.getAbsolutePath();
+            filex=new File(path, "icon.png");
+            try {
+                if (filex.exists()) {//如果文件存在
+                    filex.delete();
+                }
+                filex.createNewFile();//新建文件
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return filex;
+    }
+
     /**
      * 计算bitmap的大小
      * @param bitmap

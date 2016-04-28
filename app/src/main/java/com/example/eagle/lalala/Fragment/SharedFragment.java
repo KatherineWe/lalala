@@ -1,10 +1,12 @@
-package com.example.eagle.lalala.Fragment;
+package com.example.eagle.lalala;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
@@ -63,7 +65,7 @@ import butterknife.OnClick;
  */
 public class SharedFragment extends ListFragment implements  ICircleView {
 
-    private static final String serviceUrl="";
+    private static final String serviceUrl="http://119.29.166.177:8080/getUpdatedMarks";
 
     private String[] mStringList={"WeMark Sun.","WeMark Mon.","WeMark Tues.","WeMark Wed.","WeMark Thur.","WeMark Fri.","WeMark Sat."};
 
@@ -77,6 +79,28 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
     private CirclePresenter mPresenter;
     private CommentConfig mCommentConfig;
+//    private JSONArray jsonArray;
+    private JSONObject MarksjsonObject;
+    private PtrFrameLayout ptrFrameLayout;
+
+
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    if (MarksjsonObject != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
+//                        makeMarksList(MarksjsonObject);
+                        Toast.makeText(getActivity(),"创建朋友圈列表成功",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case -1:
+                    Toast.makeText(getActivity(),"创建朋友圈列表失败……",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            ptrFrameLayout.refreshComplete();
+
+        }
+    };
 
     @Bind(R.id.btn_recommend)
     TextView mBtnRecommend;
@@ -89,7 +113,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     @Bind(R.id.editTextBodyLl)
     LinearLayout mEditTextBody;
     private PtrFrameLayout mPtrFrameLayout;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,14 +157,15 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                frame.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadData();
-                        frame.refreshComplete();
-                    }
-                }, 2000);
-//                new FreshMarks().execute(frame);
+//                frame.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        loadData();
+//                        frame.refreshComplete();
+//                    }
+//                }, 2000);
+                ptrFrameLayout=frame;
+                new FreshMarks().execute(frame);
             }
         });
 
@@ -160,6 +184,11 @@ public class SharedFragment extends ListFragment implements  ICircleView {
             }
         });
 
+//        mSwipeRefreshLayout.setOnRefreshListener(this);
+//        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+//                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+
+        // mAdapter = new CircleAdapter(getActivity());
         mAdapter = new CircleAdapter(getActivity());
         mAdapter.setCirclePresenter(mPresenter);
         mCircleLv.setAdapter(mAdapter);
@@ -207,9 +236,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
                 break;
             case R.id.btn_focus:
-
-
-
                 break;
         }
     }
@@ -400,117 +426,113 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     }
 
 
-//    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
-//        private PtrFrameLayout ptrFrameLayout;
-//        private JSONArray jsonArray;
-//        @Override
-//        protected String doInBackground(PtrFrameLayout... params) {
-//            ptrFrameLayout = params[0];
-//            final String[] status = new String[1];
-//            final String[] info = new String[1];
-//            final JSONObject object = new JSONObject();
-//            try {
-//                object.put("userId", MainActivity.userId);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            HttpUtil.getJsonArrayByHttp(serviceUrl, object, new HttpCallbackListener() {
-//                @Override
-//                public void onFinishGetJson(JSONObject jsonObject) {
-//                    if (jsonObject != null) {
-//                        try {
-//                            status[0] =jsonObject.getString("status");
-//                            info[0] = jsonObject.getString("info");
-//                            jsonArray=jsonObject.getJSONArray("marks");////////////////////////这里是object还是listobject
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onFinishGetString(String response) {
-//
-//                }
-//
-//                @Override
-//                public void onError(Exception e) {
-//                    Log.e("SharedFrag", e.getMessage());
-//                    status[0]="0";
-//                }
-//            });
-//            if (status[0].equals("1") && info[0].equals("ok")) {
-//                return "ok";
-//            }else {
-//                return "no";
-//            }
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            super.onPreExecute();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String s) {
-//            ptrFrameLayout.refreshComplete();
-//            if (s.equals("ok")) {
-//                Toast.makeText(getActivity(),"刷新成功！",Toast.LENGTH_SHORT).show();
-//                makeMarksList(jsonArray);
-//                //loadData();把object里的数据传给这个函数////////////////////////////
-//            }else {
-//                Toast.makeText(getActivity(),"刷新失败！",Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-//
-//    private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
-//        MarksPDM marksPDM;
-//        List<commentsPDM> commentsList=new ArrayList<>();
-//        List<likesPDM> likesList=new ArrayList<>();
-//        List<MarksPDM> marksList = new ArrayList<>();
-//        for(int i=0;i<jsonArray.length();i++) {
-//            try {
-//                JSONObject marksObject = jsonArray.getJSONObject(i);
-//
-//                marksPDM = new MarksPDM();
-//                marksPDM.setUserId(marksObject.getLong("userID"));
-//                marksPDM.setMarkId(marksObject.getLong("markID"));
-//                marksPDM.setLbsName(marksObject.getString("positionName"));
-//                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
-//                marksPDM.setContent(marksObject.getString("content"));
-//                marksPDM.setPhoto(marksObject.getString("photo"));
-//                marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
-//                JSONArray commentsObject = marksObject.getJSONArray("comments");
-//                for(int j=0;j<commentsObject.length();j++) {
-//                    JSONObject comment = commentsObject.getJSONObject(j);
-//
-//                    commentsPDM commentsPDM=new commentsPDM();
-//                    commentsPDM.setCommentId(comment.getLong("commentId"));
-//                    commentsPDM.setMarkId(comment.getLong("markID"));
-//                    commentsPDM.setFriendId(comment.getLong("friendID"));
-//                    commentsPDM.setFriendName(comment.getString("friendName"));
-//                    commentsPDM.setContent(comment.getString("content"));
-//                    commentsPDM.setCommentTime((Timestamp) comment.get("commentTime"));
-//                    commentsList.add(commentsPDM);
-//                }
-//                JSONArray likesObject = marksObject.getJSONArray("likes");
-//                for (int k=0;k<likesObject.length();k++) {
-//                    JSONObject like = likesObject.getJSONObject(k);
-//
-//                    likesPDM likesPDM = new likesPDM();
-//                    likesPDM.setLikeId(like.getLong("likeID"));
-//                    likesPDM.setUserId(like.getLong("userID"));
-//                    likesPDM.setMarkId(like.getLong("markID"));
-//                    likesPDM.setUserName(like.getString("userName"));
-//                    likesList.add(likesPDM);
-//                }
-//                marksPDM.setComments(commentsList);
-//                marksPDM.setLikes(likesList);
-//                marksList.add(marksPDM);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
+        private String status;
+        private String info;
+
+        @Override
+        protected String doInBackground(PtrFrameLayout... params) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("userID", MainActivity.userId);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            HttpUtil.getJsonArrayByHttp(serviceUrl, object, new HttpCallbackListener() {
+                @Override
+                public void onFinishGetJson(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        try {
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
+                            MarksjsonObject=jsonObject.getJSONObject("marks");////////////////////////这里是object还是listobject
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
+                }
+
+                @Override
+                public void onFinishGetString(String response) {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("SharedFrag", e.getMessage());
+                    status="0";
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+        }
+    }
+
+    private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
+        MarksPDM marksPDM;
+        List<commentsPDM> commentsList=new ArrayList<>();
+        List<likesPDM> likesList=new ArrayList<>();
+        List<MarksPDM> marksList = new ArrayList<>();
+        for(int i=0;i<jsonArray.length();i++) {
+            try {
+                JSONObject marksObject = jsonArray.getJSONObject(i);
+
+                marksPDM = new MarksPDM();
+                marksPDM.setUserId(marksObject.getLong("userID"));
+                marksPDM.setMarkId(marksObject.getLong("markID"));
+                marksPDM.setPositionName(marksObject.getString("positionName"));
+                marksPDM.setAddress(marksObject.getString("address"));
+                marksPDM.setLongitude(marksObject.getDouble("longitude"));
+                marksPDM.setLatitude(marksObject.getDouble("latitude"));
+                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
+                marksPDM.setContent(marksObject.getString("content"));
+                marksPDM.setPhoto(marksObject.getString("photo"));
+                marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
+                JSONArray commentsObject = marksObject.getJSONArray("comments");
+                for(int j=0;j<commentsObject.length();j++) {
+                    JSONObject comment = commentsObject.getJSONObject(j);
+
+                    commentsPDM commentsPDM=new commentsPDM();
+                    commentsPDM.setCommentId(comment.getLong("commentId"));
+                    commentsPDM.setMarkId(comment.getLong("markID"));
+                    commentsPDM.setFriendId(comment.getLong("friendID"));
+                    commentsPDM.setFriendName(comment.getString("friendName"));
+                    commentsPDM.setContent(comment.getString("content"));
+                    commentsPDM.setCommentTime((Timestamp) comment.get("commentTime"));
+                    commentsList.add(commentsPDM);
+                }
+                JSONArray likesObject = marksObject.getJSONArray("likes");
+                for (int k=0;k<likesObject.length();k++) {
+                    JSONObject like = likesObject.getJSONObject(k);
+
+                    likesPDM likesPDM = new likesPDM();
+                    likesPDM.setLikeId(like.getLong("likeID"));
+                    likesPDM.setUserId(like.getLong("friendID"));
+                    likesPDM.setMarkId(like.getLong("markID"));
+                    likesPDM.setUserName(like.getString("friendName"));
+                    likesList.add(likesPDM);
+                }
+                marksPDM.setComments(commentsList);
+                marksPDM.setLikes(likesList);
+                marksList.add(marksPDM);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }
