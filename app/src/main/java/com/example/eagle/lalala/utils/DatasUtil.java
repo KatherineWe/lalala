@@ -69,12 +69,20 @@ public class DatasUtil {
         User user2 = new User("2", "Guan_Suns", HEADIMG[2]);
         User user3 = new User("3", "Katherine", HEADIMG[3]);
         User user4 = new User("4", "hy", HEADIMG[4]);
+        User user5 = new User("5", "赵", HEADIMG[1]);
+        User user6 = new User("6", "钱", HEADIMG[2]);
+        User user7 = new User("7", "孙", HEADIMG[3]);
+        User user8 = new User("8", "李", HEADIMG[4]);
 
         users.add(curUser);
         users.add(user1);
         users.add(user2);
         users.add(user3);
         users.add(user4);
+        users.add(user5);
+        users.add(user6);
+        users.add(user7);
+        users.add(user8);
 
         mCurrentFragment = "map_frag";
     }
