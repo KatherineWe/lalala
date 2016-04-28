@@ -65,6 +65,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
     private ServiceConnection connection;
     private ProgressDialog progressDialog;
     private HashMap<String,Object> userInfo=new HashMap<>();
+    private String password;
 
     private Handler handler = new Handler(){
         public void handleMessage(Message msg) {
@@ -223,6 +224,9 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                 if (cursor.getString(cursor.getColumnIndex("signature")) != null) {
                     signatureTv.setText(cursor.getString(cursor.getColumnIndex("signature")));
                 }
+                if (cursor.getString(cursor.getColumnIndex("password")) != null) {
+                    password=cursor.getString(cursor.getColumnIndex("password"));
+                }
                 if (cursor.getString(cursor.getColumnIndex("icon")) != null&& !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
                     Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("icon")), 120, 240);
                     iconIv.setImageBitmap(bitmap1);
@@ -290,7 +294,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                 intent.setDataAndType(Uri.fromFile(iconFile), "image/*");
                 intent.putExtra("scale", true);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(iconFile));
-                startActivityForResult(intent,BackgroundCROP_PHOTO);
+                startActivityForResult(intent,IconCROP_PHOTO);
                 break;
             case IconPICK_PHOTO:
                 //判断手机系统版本号
@@ -338,17 +342,19 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                 JSONObject object = new JSONObject();
                 try {
                     object.put("userID", MainActivity.userId);
-                    object.put("emailAddr", emailTv.getText().toString());
-                    object.put("userName", nickNameTv.getText().toString());
+                    object.put("emailAddr", HttpUtil.toUTFString(emailTv.getText().toString()));
+                    object.put("userName", HttpUtil.toUTFString(nickNameTv.getText().toString()));
+                    object.put("password", password);
                     if (((BitmapDrawable) iconIv.getDrawable()).getBitmap() != null) {
                         String icon = HandlePicture.bitmapToString(((BitmapDrawable) iconIv.getDrawable()).getBitmap());
                         object.put("icon", icon);
+                        Log.i("Modify_info:::","ModifyInSended:::"+ icon);
                     }
                     if (((BitmapDrawable) backgroundIv.getDrawable()).getBitmap() != null) {
                         String background = HandlePicture.bitmapToString(((BitmapDrawable) backgroundIv.getDrawable()).getBitmap());
                         object.put("background",background);
                     }
-                    object.put("signature", signatureTv.getText().toString());
+                    object.put("signature", HttpUtil.toUTFString(signatureTv.getText().toString()));
 
                     userInfo.put("userId", MainActivity.userId);
                     userInfo.put("email", emailTv.getText().toString());
@@ -389,6 +395,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                             status =jsonObject.getString("status");
                             info = jsonObject.getString("info");
                             Log.i("status1", "status:" + status + " info:" + info);
+                            Log.i("Modify_info:::","ModifyInReceived:::"+ jsonObject.get("icon").toString());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
