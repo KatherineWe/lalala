@@ -30,44 +30,105 @@ public class WorkWithDatabase extends Service {
 
     public class AccessDatabaseBinder extends Binder{
 
-        public void saveUserInfo(Context context){
-           // , final HashMap<String, Object> userInfo
+        public void saveUserInfo(Context context, final HashMap<String, Object> userInfo){
             databaseHelper = new WeMarkDatabaseHelper(context, "WeMark.db", null, 1);
             final SQLiteDatabase db=databaseHelper.getWritableDatabase();
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    ContentValues values = new ContentValues();
-//                    boolean flag=false;
-//                    if (userInfo.get("userId") != null) {
-//                        values.put(WeMarkDatabaseHelper.USER_ID,(long)userInfo.get("userId"));
-//                        flag=true;//标志有userId，不为空才可以插入
-//                    }
-//                    if (userInfo.get("email") != null) {
-//                        values.put(WeMarkDatabaseHelper.EMAIL,userInfo.get("email").toString());
-//                    }
-//                    if (userInfo.get("userName") != null) {
-//                        values.put(WeMarkDatabaseHelper.USER_NAME,userInfo.get("userName").toString());
-//                    }
-//                    if (userInfo.get("password") != null) {
-//                        values.put(WeMarkDatabaseHelper.PASSWORD,userInfo.get("password").toString());
-//                    }
-//                    if (userInfo.get("icon") != null) {
-//                        Bitmap bitmap= HandlePicture.StringToBitmap(userInfo.get("icon").toString());
-//                        values.put(WeMarkDatabaseHelper.ICON,HandlePicture.bitmapTobyte(bitmap));
-//                    }
-//                    if (userInfo.get("background") != null) {
-//                        Bitmap bitmap= HandlePicture.StringToBitmap(userInfo.get("background").toString());
-//                        values.put(WeMarkDatabaseHelper.BACKGROUND,HandlePicture.bitmapTobyte(bitmap));
-//                    }
-//                    if (userInfo.get("signature") != null) {
-//                        values.put(WeMarkDatabaseHelper.SIGNATURE,userInfo.get("signature").toString());
-//                    }
-//                    if(flag){
-//                        db.insert(WeMarkDatabaseHelper.USER_TABLE, null, values);
-//                    }
-//                }
-//            }).start();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        db.beginTransaction();
+                        try {
+                            db.delete(WeMarkDatabaseHelper.USER_TABLE, null, null);//删除表的数据
+                            ContentValues values = new ContentValues();
+                            boolean flag = false;
+                            if ((long) userInfo.get("userId") != 0) {
+                                values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
+                                flag = true;//标志有userId，不为空才可以插入
+                            }
+                            if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
+                                values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                            }
+                            if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
+                                values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                            }
+                            if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
+                                values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
+                            }
+                            if (userInfo.get("icon") != null && !userInfo.get("icon").toString().equals("")) {
+//                                Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("icon").toString());
+//                                values.put(WeMarkDatabaseHelper.ICON, HandlePicture.bitmapTobyte(bitmap));
+                                values.put(WeMarkDatabaseHelper.ICON,userInfo.get("icon").toString());
+                            }
+                            if (userInfo.get("background") != null && !userInfo.get("background").toString().equals("")) {
+//                                Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("background").toString());
+//                                values.put(WeMarkDatabaseHelper.BACKGROUND, HandlePicture.bitmapTobyte(bitmap));
+                                values.put(WeMarkDatabaseHelper.BACKGROUND,userInfo.get("background").toString());
+                            }
+                            if (userInfo.get("signature") != null) {
+                                values.put(WeMarkDatabaseHelper.SIGNATURE, userInfo.get("signature").toString());
+                            }
+                            if (flag) {
+                                db.insert(WeMarkDatabaseHelper.USER_TABLE, null, values);
+                            }
+                            db.setTransactionSuccessful();
+                        } catch (Exception e) {
+                        e.printStackTrace();
+                    }finally {
+                        db.endTransaction();
+                    }
+
+                    }
+                }).start();
+
+        }
+
+        public void upDateUserInfo(Context context, final HashMap<String, Object> userInfo) {
+            databaseHelper = new WeMarkDatabaseHelper(context, "WeMark.db", null, 1);
+            final SQLiteDatabase db=databaseHelper.getWritableDatabase();
+            db.beginTransaction();
+            try {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ContentValues values = new ContentValues();
+                        boolean flag = false;
+                        if ((long) userInfo.get("userId") != 0) {
+                            values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
+                            flag = true;//标志有userId，不为空才可以插入
+                        }
+                        if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
+                            values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                        }
+                        if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
+                            values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                        }
+                        if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
+                            values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
+                        }
+                        if (userInfo.get("icon") != null && !userInfo.get("icon").toString().equals("")) {
+//                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("icon").toString());
+//                            values.put(WeMarkDatabaseHelper.ICON, HandlePicture.bitmapTobyte(bitmap));
+                            values.put(WeMarkDatabaseHelper.ICON,userInfo.get("icon").toString());
+                        }
+                        if (userInfo.get("background") != null && !userInfo.get("background").toString().equals("")) {
+//                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("background").toString());
+//                            values.put(WeMarkDatabaseHelper.BACKGROUND, HandlePicture.bitmapTobyte(bitmap));
+                            values.put(WeMarkDatabaseHelper.BACKGROUND,userInfo.get("background").toString());
+                        }
+                        if (userInfo.get("signature") != null) {
+                            values.put(WeMarkDatabaseHelper.SIGNATURE, userInfo.get("signature").toString());
+                        }
+                        if (flag) {
+                            db.update(WeMarkDatabaseHelper.USER_TABLE, values,"userId="+userInfo.get("userId"),null);
+                        }
+                        db.setTransactionSuccessful();
+                    }
+                }).start();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }finally {
+                db.endTransaction();
+            }
         }
 
 

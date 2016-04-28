@@ -3,6 +3,8 @@ package com.example.eagle.lalala;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
@@ -60,7 +62,7 @@ import butterknife.OnClick;
  */
 public class SharedFragment extends ListFragment implements  ICircleView {
 
-    private static final String serviceUrl="";
+    private static final String serviceUrl="http://119.29.166.177:8080/getUpdatedMarks";
 
     private String[] mStringList={"WeMark Sun.","WeMark Mon.","WeMark Tues.","WeMark Wed.","WeMark Thur.","WeMark Fri.","WeMark Sat."};
 
@@ -74,6 +76,28 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
     private CirclePresenter mPresenter;
     private CommentConfig mCommentConfig;
+//    private JSONArray jsonArray;
+    private JSONObject MarksjsonObject;
+    private PtrFrameLayout ptrFrameLayout;
+
+
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    if (MarksjsonObject != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
+//                        makeMarksList(MarksjsonObject);
+                        Toast.makeText(getActivity(),"创建朋友圈列表成功",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case -1:
+                    Toast.makeText(getActivity(),"创建朋友圈列表失败……",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            ptrFrameLayout.refreshComplete();
+
+        }
+    };
 
     @Bind(R.id.btn_recommend)
     TextView mBtnRecommend;
@@ -129,14 +153,15 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                frame.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadData();
-                        frame.refreshComplete();
-                    }
-                }, 2000);
-//                new FreshMarks().execute(frame);
+//                frame.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        loadData();
+//                        frame.refreshComplete();
+//                    }
+//                }, 2000);
+                ptrFrameLayout=frame;
+                new FreshMarks().execute(frame);
             }
         });
 
@@ -411,16 +436,14 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
 
     private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
-        private PtrFrameLayout ptrFrameLayout;
-        private JSONArray jsonArray;
+        private String status;
+        private String info;
+
         @Override
         protected String doInBackground(PtrFrameLayout... params) {
-            ptrFrameLayout = params[0];
-            final String[] status = new String[1];
-            final String[] info = new String[1];
-            final JSONObject object = new JSONObject();
+            JSONObject object = new JSONObject();
             try {
-                object.put("userId", MainActivity.userId);
+                object.put("userID", MainActivity.userId);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -429,13 +452,20 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 public void onFinishGetJson(JSONObject jsonObject) {
                     if (jsonObject != null) {
                         try {
-                            status[0] =jsonObject.getString("status");
-                            info[0] = jsonObject.getString("info");
-                            jsonArray=jsonObject.getJSONArray("marks");////////////////////////这里是object还是listobject
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
+                            MarksjsonObject=jsonObject.getJSONObject("marks");////////////////////////这里是object还是listobject
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
                 }
 
                 @Override
@@ -446,14 +476,10 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 @Override
                 public void onError(Exception e) {
                     Log.e("SharedFrag", e.getMessage());
-                    status[0]="0";
+                    status="0";
                 }
             });
-            if (status[0].equals("1") && info[0].equals("ok")) {
-                return "ok";
-            }else {
-                return "no";
-            }
+            return null;
         }
 
         @Override
@@ -463,14 +489,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
         @Override
         protected void onPostExecute(String s) {
-            ptrFrameLayout.refreshComplete();
-            if (s.equals("ok")) {
-                Toast.makeText(getActivity(),"刷新成功！",Toast.LENGTH_SHORT).show();
-                makeMarksList(jsonArray);
-                //loadData();把object里的数据传给这个函数////////////////////////////
-            }else {
-                Toast.makeText(getActivity(),"刷新失败！",Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -486,7 +504,10 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 marksPDM = new MarksPDM();
                 marksPDM.setUserId(marksObject.getLong("userID"));
                 marksPDM.setMarkId(marksObject.getLong("markID"));
-                marksPDM.setLbsName(marksObject.getString("positionName"));
+                marksPDM.setPositionName(marksObject.getString("positionName"));
+                marksPDM.setAddress(marksObject.getString("address"));
+                marksPDM.setLongitude(marksObject.getDouble("longitude"));
+                marksPDM.setLatitude(marksObject.getDouble("latitude"));
                 marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
                 marksPDM.setContent(marksObject.getString("content"));
                 marksPDM.setPhoto(marksObject.getString("photo"));
@@ -510,9 +531,9 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
                     likesPDM likesPDM = new likesPDM();
                     likesPDM.setLikeId(like.getLong("likeID"));
-                    likesPDM.setUserId(like.getLong("userID"));
+                    likesPDM.setUserId(like.getLong("friendID"));
                     likesPDM.setMarkId(like.getLong("markID"));
-                    likesPDM.setUserName(like.getString("userName"));
+                    likesPDM.setUserName(like.getString("friendName"));
                     likesList.add(likesPDM);
                 }
                 marksPDM.setComments(commentsList);

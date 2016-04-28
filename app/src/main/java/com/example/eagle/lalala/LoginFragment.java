@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
@@ -52,6 +54,20 @@ public class LoginFragment extends Fragment {
     private static final int REQUEST_SIGNUP = 1;
     private ProgressDialog progressDialog;
 
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+//                    Log.i("status4","jsonInHandler:::"+ msg.obj.toString());
+                    onLoginSuccess((JSONObject) msg.obj);
+                    break;
+                case -1:
+                    onLoginFailed();
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,16 +110,16 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    public void onLoginSuccess(String userString) {
+    public void onLoginSuccess(JSONObject object) {
         mBtnLogin.setEnabled(true);
-        userJson = new ConveyJson(userString);
+        userJson = new ConveyJson(object);
         Intent startMainAty = new Intent(getActivity(), MainActivity.class);
         startMainAty.putExtra("userInfo", userJson);
         startActivity(startMainAty);
     }
 
     public void onLoginFailed() {
-        Toast.makeText(getActivity(), "登陆失败", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "登陆失败，请输入正确的账号或者密码", Toast.LENGTH_SHORT).show();
         mBtnLogin.setEnabled(true);
     }
 
@@ -202,6 +218,14 @@ public class LoginFragment extends Fragment {
                             e.printStackTrace();
                         }
                     }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                        message.obj=object;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
                 }
 
                 @Override
@@ -215,13 +239,7 @@ public class LoginFragment extends Fragment {
                     status="0";
                 }
             });
-            Log.i("status", "status:" + status + " info:" + info);
-            if (status != null && info != null) {
-                if (status.equals("1") && info.equals("OK")) {
-                    return "ok";
-                }
-            }
-            return "no";
+            return null;
         }
 
         @Override
@@ -236,11 +254,6 @@ public class LoginFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             progressDialog.dismiss();
-            if (s.equals("ok")) {
-                onLoginSuccess(object.toString());
-            }else {
-                onLoginFailed();
-            }
         }
     }
 }

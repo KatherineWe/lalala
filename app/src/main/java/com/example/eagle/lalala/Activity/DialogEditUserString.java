@@ -17,9 +17,8 @@ import com.example.eagle.lalala.R;
 /**
  * Created by NeilHY on 2016/4/26.
  */
-public class DialogEditUserInfo extends DialogFragment {
+public class DialogEditUserString extends DialogFragment {
 
-    private TextView title;
     private EditText infoEdit;
 
     public interface EditInputListener
@@ -41,7 +40,6 @@ public class DialogEditUserInfo extends DialogFragment {
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(view)
                 .setTitle(bundle.getString("title"))
-
                 // Add action buttons
                 .setPositiveButton("确定",
                         new DialogInterface.OnClickListener()

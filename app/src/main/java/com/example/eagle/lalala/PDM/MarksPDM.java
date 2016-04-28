@@ -14,8 +14,11 @@ import java.util.List;
 public class MarksPDM {
     private long userId;
     private long markId;
-    private String lbsName;
     private Timestamp createTime;
+    private double longitude;
+    private double latitude;
+    private String positionName;
+    private String address;
     private String content;
     private Bitmap photo;
     private Authorities authority;
@@ -25,11 +28,14 @@ public class MarksPDM {
     public MarksPDM() {
     }
 
-    public MarksPDM(long userId, long markId, String lbsName, Timestamp createTime, String content, String photo, Authorities authority, List<commentsPDM> comments, List<likesPDM> likes) {
+    public MarksPDM(long userId, long markId, Timestamp createTime, double longitude, double latitude, String positionName, String address, String content, String photo, Authorities authority, List<commentsPDM> comments, List<likesPDM> likes) {
         this.userId = userId;
         this.markId = markId;
-        this.lbsName = lbsName;
         this.createTime = createTime;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.positionName = positionName;
+        this.address = address;
         this.content = content;
         this.photo = HandlePicture.StringToBitmap(photo);
         this.authority = authority;
@@ -53,12 +59,36 @@ public class MarksPDM {
         this.markId = markId;
     }
 
-    public String getLbsName() {
-        return lbsName;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLbsName(String lbsName) {
-        this.lbsName = lbsName;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getPositionName() {
+        return positionName;
+    }
+
+    public void setPositionName(String positionName) {
+        this.positionName = positionName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Timestamp getCreateTime() {

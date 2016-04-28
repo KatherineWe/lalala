@@ -94,7 +94,11 @@ public class HttpUtil  {
                         JSONObject jsonObject = new JSONObject(builder.toString());
                         if (listener != null) {
                             //回调onFinish方法
+                            Log.i("HttpUtiljson", "json:"+jsonObject.toString());
                             listener.onFinishGetJson(jsonObject);
+                        }
+                        else{
+                            Log.i("HttpUtilnull", "listener:null");
                         }
                     }
 

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
@@ -32,6 +34,20 @@ public class SignUpFragment extends Fragment {
 
     private static final String serviceUrl="http://119.29.166.177:8080/signUp";
     private ProgressDialog progressDialog;
+
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    Toast.makeText(getActivity(),"注册成功！",Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                    break;
+                case -1:
+                    Toast.makeText(getActivity(),"注册失败！请重新注册~",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     @Bind(R.id.input_nickname)
     EditText mInputNickname;
@@ -91,6 +107,8 @@ public class SignUpFragment extends Fragment {
                         e.printStackTrace();
                     }
                     new SignUp().execute(object);
+//                    Log.i("status4", "status:" + status + " info:" + info);
+
                 }
                 break;
             case R.id.link_login:
@@ -148,14 +166,25 @@ public class SignUpFragment extends Fragment {
             HttpUtil.getJsonArrayByHttp(serviceUrl, params[0], new HttpCallbackListener() {
                 @Override
                 public void onFinishGetJson(JSONObject jsonObject) {
-                    if (jsonObject != null) {
+                    if (jsonObject == null) {
+                        Log.i("status", "json:null" );
+                    } else if(jsonObject != null){
                         try {
+                            Log.i("status", "json:"+jsonObject.toString() );
                             status =jsonObject.getString("status");
                             info = jsonObject.getString("info");
+                            Log.i("status1", "status:" + status + " info:" + info);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
                 }
 
                 @Override
@@ -169,13 +198,14 @@ public class SignUpFragment extends Fragment {
                     status="0";
                 }
             });
-            Log.i("status", "status:" + status + " info:" + info);
-            if (status != null && info != null) {
-                if (status.equals("1") && info.equals("OK")) {
-                    return "ok";
-                }
-            }
-            return "no";
+//            Log.i("status2", "status:" + status + " info:" + info);
+//            if (status != null && info != null) {
+//                if (status.equals("1") && info.equals("OK")) {
+//                    return "ok";
+//                }
+//            }
+//            return "no";
+            return null;
         }
 
         @Override
@@ -190,12 +220,13 @@ public class SignUpFragment extends Fragment {
         @Override
         protected void onPostExecute(String s) {
             progressDialog.dismiss();
-            if (s.equals("ok")) {
-                Toast.makeText(getActivity(),"注册成功！",Toast.LENGTH_SHORT).show();
-                getActivity().finish();
-            }else {
-                Toast.makeText(getActivity(),"注册失败！请重新注册~",Toast.LENGTH_SHORT).show();
-            }
+            Log.i("status3", "status:" + status + " info:" + info);
+//            if (status.equals("1") && info.equals("OK")) {
+//                Toast.makeText(getActivity(),"注册成功！",Toast.LENGTH_SHORT).show();
+////                getActivity().finish();
+//            }else {
+//                Toast.makeText(getActivity(),"注册失败！请重新注册~",Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
