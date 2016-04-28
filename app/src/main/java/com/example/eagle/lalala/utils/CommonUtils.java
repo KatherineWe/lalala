@@ -35,8 +35,12 @@ public class CommonUtils {
         return imm.isActive();//true 打开
     }
 
-    public static void changeFrag(FragmentActivity context, Fragment from, Fragment to) {
+    public static void changeFrag(FragmentActivity context, String fromTag, String toTag) {
+        if(toTag == DatasUtil.mCurrentFragment)
+            return;
         FragmentTransaction transaction = context.getSupportFragmentManager().beginTransaction();
+        Fragment from = context.getSupportFragmentManager().findFragmentByTag(fromTag);
+        Fragment to = context.getSupportFragmentManager().findFragmentByTag(toTag);
         if(!to.isAdded())
             transaction.hide(from).add(R.id.single_frag_container, to).commit();
         else

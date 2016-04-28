@@ -15,9 +15,12 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.adapter.ContactAdapter;
+import com.example.eagle.lalala.bean.User;
+import com.example.eagle.lalala.utils.CommonUtils;
 import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.eagle.lalala.widgets.SideBar;
 
@@ -95,21 +98,8 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
     }
 
     private void initData() {
-//        if (GloableParams.UserInfos != null) {
                 lvContact.setAdapter(new ContactAdapter(getActivity(),
                         DatasUtil.getUsers()));
-//            } else {
-//                FinalDb db = FinalDb
-//                        .create(getActivity(), Constants.DB_NAME, false);
-//                GloableParams.UserInfos = db.findAllByWhere(User.class, "type='N'");
-//                lvContact.setAdapter(new ContactAdapter(getActivity(),
-//                        GloableParams.UserInfos));
-//                for (User user : GloableParams.UserInfos) {
-//                    GloableParams.Users.put(user.getTelephone(), user);
-//                }
-            // Intent intent = new Intent(getActivity(), UpdateService.class);
-            // getActivity().startService(intent);
-     //   }
     }
 
     private void setOnListener() {
@@ -136,7 +126,8 @@ public class ContactFragment extends Fragment implements View.OnClickListener,
 
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-//        User user = GloableParams.UserInfos.get(arg2 - 1);
+        User user = DatasUtil.getUsers().get(arg2 - 1);
+        Toast.makeText(getActivity(),user.getName(),Toast.LENGTH_SHORT).show();
 //        if (user != null) {
 //            Intent intent = new Intent(getActivity(), FriendMsgActivity.class);
 //            intent.putExtra(Constants.NAME, user.getUserName());

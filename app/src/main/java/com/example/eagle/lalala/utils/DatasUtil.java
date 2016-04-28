@@ -17,6 +17,8 @@ import java.util.Random;
  * @date 2015-12-28 下午4:16:21
  */
 public class DatasUtil {
+
+    public static String mCurrentFragment;
     public static final String[] CONTENTS = {"", "哈哈", "今天是个好日子", "呵呵", "图不错",
             "我勒个去"};
     public static final String[] PHOTOS = {
@@ -73,10 +75,8 @@ public class DatasUtil {
         users.add(user2);
         users.add(user3);
         users.add(user4);
-        users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","baa",HEADIMG[4]));users.add(new User("5","caa",HEADIMG[4]));
-        users.add(new User("5","daa",HEADIMG[4]));users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","王aa",HEADIMG[4]));
-        users.add(new User("5","aaa",HEADIMG[4]));users.add(new User("5","haa",HEADIMG[4]));users.add(new User("5","21aa",HEADIMG[4]));
-        users.add(new User("5","傻货aa",HEADIMG[4]));users.add(new User("5","zaa",HEADIMG[4]));users.add(new User("5","aaa",HEADIMG[4]));
+
+        mCurrentFragment = "map_frag";
     }
 
     public static List<CircleItem> getCircleDatas() {

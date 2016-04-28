@@ -93,7 +93,8 @@ public class CircleAdapter extends BaseAdapter {
             holder.digLine = convertView.findViewById(R.id.lin_dig);
 
             holder.contentTv = (TextView) convertView.findViewById(R.id.contentTv);
-            holder.urlTipTv = (TextView) convertView.findViewById(R.id.urlTipTv);
+           // holder.urlTipTv = (TextView) convertView.findViewById(R.id.urlTipTv);
+            holder.locationTv = (TextView) convertView.findViewById(R.id.locationTv);
             holder.timeTv = (TextView) convertView.findViewById(R.id.timeTv);
             holder.deleteBtn = (TextView) convertView.findViewById(R.id.deleteBtn);
             holder.snsBtn = (ImageView) convertView.findViewById(R.id.snsBtn);
@@ -133,6 +134,7 @@ public class CircleAdapter extends BaseAdapter {
         holder.nameTv.setText(name);
         holder.timeTv.setText(createTime);
         holder.contentTv.setText(content);
+        holder.locationTv.setText("爪哇国");
         holder.contentTv.setVisibility(TextUtils.isEmpty(content) ? View.GONE : View.VISIBLE);
         //holder.imageView.setImageURI(mainImg);
 
@@ -168,26 +170,26 @@ public class CircleAdapter extends BaseAdapter {
             }
 
             if (hasComment) {//处理评论列表
-                holder.commentList.setOnItemClick(new CommentListView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(int commentPosition) {
-                        CommentItem commentItem = commentsDatas.get(commentPosition);
-                        if (DatasUtil.curUser.getId().equals(commentItem.getUser().getId())) {//复制或者删除自己的评论
-
-                            CommentDialog dialog = new CommentDialog(mContext, mPresenter, commentItem, position);
-                            dialog.show();
-                        } else {//回复别人的评论
-                            if (mPresenter != null) {
-                                CommentConfig config = new CommentConfig();
-                                config.circlePosition = position;
-                                config.commentPosition = commentPosition;
-                                config.commentType = CommentConfig.Type.REPLY;
-                                config.replyUser = commentItem.getUser();
-                                mPresenter.showEditTextBody(config);
-                            }
-                        }
-                    }
-                });
+//                holder.commentList.setOnItemClick(new CommentListView.OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(int commentPosition) {
+//                        CommentItem commentItem = commentsDatas.get(commentPosition);
+//                        if (DatasUtil.curUser.getId().equals(commentItem.getUser().getId())) {//复制或者删除自己的评论
+//
+//                            CommentDialog dialog = new CommentDialog(mContext, mPresenter, commentItem, position);
+//                            dialog.show();
+//                        } else {//回复别人的评论
+//                            if (mPresenter != null) {
+//                                CommentConfig config = new CommentConfig();
+//                                config.circlePosition = position;
+//                                config.commentPosition = commentPosition;
+//                                config.commentType = CommentConfig.Type.REPLY;
+//                                config.replyUser = commentItem.getUser();
+//                                mPresenter.showEditTextBody(config);
+//                            }
+//                        }
+//                    }
+//                });
                 holder.commentList.setOnItemLongClick(new CommentListView.OnItemLongClickListener() {
                     @Override
                     public void onItemLongClick(int commentPosition) {
@@ -230,9 +232,10 @@ public class CircleAdapter extends BaseAdapter {
             }
         });
 
-        holder.urlTipTv.setVisibility(View.GONE);
+        //holder.urlTipTv.setVisibility(View.GONE);
         final int width = holder.imageView.getMeasuredWidth();
         final int height =  holder.imageView.getMeasuredHeight();
+
         holder.imageView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -248,12 +251,12 @@ public class CircleAdapter extends BaseAdapter {
     class ViewHolder {
         public CircularImage headIv;
         public TextView nameTv;
-        public TextView urlTipTv;
         /**
          * 动态的内容
          */
         public TextView contentTv;
         public TextView timeTv;
+        public TextView locationTv;
         public TextView deleteBtn;
         public ImageView snsBtn;
         /**

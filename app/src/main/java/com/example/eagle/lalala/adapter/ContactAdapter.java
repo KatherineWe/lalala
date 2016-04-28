@@ -1,6 +1,7 @@
 package com.example.eagle.lalala.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +81,9 @@ public class ContactAdapter extends BaseAdapter implements SectionIndexer {
 				tvCatalog.setText(String.valueOf(catalog));
 			}
 		}
+
+
+
 
 		ImageLoader.getInstance().displayImage(user.getHeadUrl(),ivAvatar);
 //		ivAvatar.setImageURI(user.getHeadUrl());

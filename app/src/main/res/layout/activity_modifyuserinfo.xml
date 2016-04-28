@@ -17,7 +17,7 @@
             android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:src="@drawable/android1"
+            android:src="@drawable/ic_search"
             android:contentDescription="@string/background" />
 
         <LinearLayout
@@ -39,7 +39,7 @@
                 android:id="@+id/modify_icon_iv"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:src="@drawable/android1"
+                android:src="@drawable/ic_search"
                 android:contentDescription="@string/icon_name" />
         </LinearLayout>
         <LinearLayout

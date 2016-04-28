@@ -11,6 +11,7 @@ public class User {
     private String name;
     private String headUrl;
 
+
     public User(String id, String name, String headUrl) {
         this.id = id;
         this.name = name;

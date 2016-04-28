@@ -30,8 +30,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
 import com.example.eagle.lalala.Edit_marks_aty;
 import com.example.eagle.lalala.Fragment.MapFragment;
 import com.example.eagle.lalala.PacelForConvey.ConveyJson;
@@ -39,8 +37,10 @@ import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.Fragment.SharedFragment;
+import com.example.eagle.lalala.SQL.WeMarkDatabaseHelper;
 import com.example.eagle.lalala.Service.WorkWithDatabase;
 import com.example.eagle.lalala.utils.CommonUtils;
+import com.example.eagle.lalala.utils.DatasUtil;
 import com.example.neilhy.floatingbutton_library.FloatingActionButton;
 import com.example.neilhy.floatingbutton_library.FloatingActionMenu;
 
@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView mTextViewTitleList;
     TextView mUserName;
     ImageView mUserIcon;
-    @Bind(R.id.btn_info_in_MainActivity)
-    ImageButton mBtnInfoInMainActivity;
-    @Bind(R.id.btn_search_in_MainActivity)
+//    @Bind(R.id.btn_info_in_MainActivity)
+//    ImageButton mBtnInfoInMainActivity;
+    @Bind(R.id.btn_contacts_in_MainActivity)
     ImageButton mBtnSearchInMainActivity;
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
@@ -95,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Fragment mMapFrgment;
     private Fragment mRecommendedFragment;
     private Fragment mFocusedFragment;
+    private Fragment mPostedFragment;
+    private Fragment mFavoriteFragment;
 
     private WorkWithDatabase.AccessDatabaseBinder accessDatabaseBinder;//对后台的绑定
     private ServiceConnection connection;
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-        saveUserInfo();//启用后台获取数据库中用户的数据
+        //saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
     @Override
@@ -119,13 +121,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMapFrgment = new MapFragment();
         mRecommendedFragment = new SharedFragment();
         mFocusedFragment = new SharedFragment();
+        mPostedFragment = new SharedFragment();
+        mFavoriteFragment = new SharedFragment();
 
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.single_frag_container,mRecommendedFragment,"recommended_frag")
                 .add(R.id.single_frag_container,mMapFrgment,"map_frag")
-                //.add(R.id.single_frag_container,mFocusedFragment,"focused_frag")
+                .add(R.id.single_frag_container,mFocusedFragment,"focused_frag")
+                .add(R.id.single_frag_container,mFavoriteFragment,"favorite_frag")
+                .add(R.id.single_frag_container,mPostedFragment,"posted_frag")
+                .hide(mFavoriteFragment)
+                .hide(mPostedFragment)
                 .hide(mRecommendedFragment)
-                // .hide(mFocusedFragment)
+                .hide(mFocusedFragment)
                 .commit();
 
         RelativeLayout drawerHeaderLayout= (RelativeLayout) mNavigationView.getHeaderView(0);
@@ -147,13 +155,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.makeText(MainActivity.this,"message",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.menu_favorite:
-
-                        break;
-                    case R.id.menu_likes:
-
+                        CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"favorite_frag");
+                        DatasUtil.mCurrentFragment = "favorite_frag";
                         break;
                     case R.id.menu_posted:
-
+                        CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"posted_frag");
+                        DatasUtil.mCurrentFragment = "posted_frag";
                         break;
                     case R.id.menu_setting:
 
@@ -199,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 out.flush();
                 out.close();
             } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }catch (IOException e){
                 e.printStackTrace();
             }
         }
@@ -255,21 +264,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startActivityForResult(intent,TAKE_PHOTO);//启动相机程序
     }
 
-    @OnClick({R.id.textView_title_map, R.id.textView_title_list, R.id.btn_info_in_MainActivity, R.id.btn_search_in_MainActivity})
+    @OnClick({R.id.textView_title_map, R.id.textView_title_list, R.id.btn_contacts_in_MainActivity})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.textView_title_map:
-                CommonUtils.changeFrag(MainActivity.this,mRecommendedFragment,mMapFrgment);
+                CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"map_frag");
+                DatasUtil.mCurrentFragment = "map_frag";
                 //changeFrag(getSupportFragmentManager().findFragmentByTag("list_frag"),getSupportFragmentManager().findFragmentByTag("map_frag"));
                 break;
             case R.id.textView_title_list:
-                CommonUtils.changeFrag(MainActivity.this,mMapFrgment,mRecommendedFragment);
+               // CommonUtils.changeFrag(MainActivity.this,mMapFrgment,mRecommendedFragment);
                 //changeFrag(getSupportFragmentManager().findFragmentByTag("map_frag"),getSupportFragmentManager().findFragmentByTag("list_frag"));
+                CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"recommended_frag");
+                DatasUtil.mCurrentFragment = "recommended_frag";
                 break;
-            case R.id.btn_info_in_MainActivity:
-                startActivity(new Intent(MainActivity.this, InfoActivity.class));
-                break;
-            case R.id.btn_search_in_MainActivity:
+//            case R.id.btn_info_in_MainActivity:
+//                startActivity(new Intent(MainActivity.this, InfoActivity.class));
+//                break;
+            case R.id.btn_contacts_in_MainActivity:
+                startActivity(new Intent(MainActivity.this,ContactActivity.class));
                 break;
             case R.id.fab_add:
                 Intent intent = new Intent(MainActivity.this, Edit_marks_aty.class);
