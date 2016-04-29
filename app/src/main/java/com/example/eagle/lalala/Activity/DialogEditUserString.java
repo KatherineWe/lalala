@@ -23,13 +23,13 @@ public class DialogEditUserString extends DialogFragment {
 
     public interface EditInputListener
     {
-        void onEditInputComplete(String info);
+        void onEditInputComplete(String info,int i);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState)
     {
-        Bundle bundle=getArguments();
+        final Bundle bundle=getArguments();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -48,7 +48,11 @@ public class DialogEditUserString extends DialogFragment {
                             public void onClick(DialogInterface dialog, int id)
                             {
                                 EditInputListener listener= (EditInputListener) getActivity();
-                                listener.onEditInputComplete(infoEdit.getText().toString());
+                                if(bundle.getInt("flag")==1) {
+                                    listener.onEditInputComplete(infoEdit.getText().toString(),1);
+                                }else{
+                                    listener.onEditInputComplete(infoEdit.getText().toString(),2);
+                                }
                             }
                         }).setNegativeButton("取消", null);
         return builder.create();

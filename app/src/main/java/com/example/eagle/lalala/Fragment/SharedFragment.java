@@ -1,6 +1,7 @@
 package com.example.eagle.lalala.Fragment;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Rect;
 import android.os.AsyncTask;
@@ -79,28 +80,29 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
     private CirclePresenter mPresenter;
     private CommentConfig mCommentConfig;
-//    private JSONArray jsonArray;
-    private JSONObject MarksjsonObject;
+    //    private JSONArray jsonArray;
+    private JSONArray MarksjsonArray;
     private PtrFrameLayout ptrFrameLayout;
 
 
-//    private Handler handler = new Handler(){
-//        public void handleMessage(Message msg) {
-//            switch (msg.what) {
-//                case 1:
-//                    if (MarksjsonObject != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
-////                        makeMarksList(MarksjsonObject);
-//                        Toast.makeText(getActivity(),"创建朋友圈列表成功",Toast.LENGTH_SHORT).show();
-//                    }
-//                    break;
-//                case -1:
-//                    Toast.makeText(getActivity(),"创建朋友圈列表失败……",Toast.LENGTH_SHORT).show();
-//                    break;
-//            }
-//            ptrFrameLayout.refreshComplete();
-//
-//        }
-//    };
+    private Handler handler = new Handler(){
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    if (MarksjsonArray != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
+                        makeMarksList(MarksjsonArray);
+                        Log.i("SharedFrag:Array::", MarksjsonArray.toString());
+                        Toast.makeText(getActivity(),"刷新朋友圈列表成功",Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case -1:
+                    Toast.makeText(getActivity(),"刷新朋友圈列表失败……",Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            ptrFrameLayout.refreshComplete();
+
+        }
+    };
 
     @Bind(R.id.btn_recommend)
     TextView mBtnRecommend;
@@ -157,15 +159,15 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
             @Override
             public void onRefreshBegin(final PtrFrameLayout frame) {
-                frame.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadData();
-                        frame.refreshComplete();
-                    }
-                }, 2000);
-//                ptrFrameLayout=frame;
-//                new FreshMarks().execute(frame);
+//                frame.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        loadData();
+//                        frame.refreshComplete();
+//                    }
+//                }, 2000);
+                ptrFrameLayout=frame;
+                new FreshMarks().execute(frame);
             }
         });
 
@@ -429,35 +431,119 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     }
 
 
-//    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
+    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
+        private String status;
+        private String info;
+
+        @Override
+        protected String doInBackground(PtrFrameLayout... params) {
+            JSONObject object = new JSONObject();
+            try {
+                object.put("userID", MainActivity.userId);
+                Log.i("SharedFrag:id:", object.get("userID").toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            HttpUtil.getJsonArrayByHttp(serviceUrl, object, new HttpCallbackListener() {
+                @Override
+                public void onFinishGetJson(JSONObject jsonObject) {
+                    if (jsonObject != null) {
+                        try {
+                            status =jsonObject.getString("status");
+                            info = jsonObject.getString("info");
+                            MarksjsonArray=jsonObject.getJSONArray("marks");////////////////////////这里是object还是listobject
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Message message=new Message();
+                    if (status.equals("1") && info.equals("OK")) {
+                        message.what=1;
+                    }else{
+                        message.what=-1;
+                    }
+                    handler.sendMessage(message);
+                }
+
+                @Override
+                public void onFinishGetString(String response) {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("SharedFrag", e.getMessage());
+                    status="0";
+                }
+            });
+            return null;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+        }
+    }
+
+//==================================================================================
+    //获取自己朋友圈的异步类
+//    private static final String serviceUrl="http://119.29.166.177:8080/getMyMarks;
+//    private ProgressDialog progressDialog;
+//    private JSONArray MarksjsonArray;
+//    private Handler handler = new Handler(){
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case 1:
+//                    if (MarksjsonArray != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
+//                        makeMarksList(MarksjsonArray);
+//                        Log.i("SharedFrag:Array::", MarksjsonArray.toString());
+//                        Toast.makeText(getActivity(),"刷新朋友圈列表成功",Toast.LENGTH_SHORT).show();
+//                    }
+//                    break;
+//                case -1:
+//                    Toast.makeText(getActivity(),"刷新朋友圈列表失败……",Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//              progressDialog.dismiss();
+//        }
+//    };
+//
+//    private class getMyMarks extends AsyncTask<Void, Void, Void> {
 //        private String status;
 //        private String info;
-//
 //        @Override
-//        protected String doInBackground(PtrFrameLayout... params) {
+//        protected Void doInBackground(Void... params) {
 //            JSONObject object = new JSONObject();
 //            try {
 //                object.put("userID", MainActivity.userId);
 //            } catch (JSONException e) {
 //                e.printStackTrace();
 //            }
-//            HttpUtil.getJsonArrayByHttp(serviceUrl, object, new HttpCallbackListener() {
+//            HttpUtil.getJsonArrayByHttp(serviceUrl,object, new HttpCallbackListener() {
 //                @Override
 //                public void onFinishGetJson(JSONObject jsonObject) {
-//                    if (jsonObject != null) {
+//                    if (jsonObject == null) {
+//                        Log.i("status", "json:null");
+//                    } else if (jsonObject != null) {
 //                        try {
-//                            status =jsonObject.getString("status");
+//                            Log.i("status", "json:" + jsonObject.toString());
+//                            status = jsonObject.getString("status");
 //                            info = jsonObject.getString("info");
-//                            MarksjsonObject=jsonObject.getJSONObject("marks");////////////////////////这里是object还是listobject
+//                            MarksjsonArray=jsonObject.getJSONArray("marks");
+//                            Log.i("status1", "status:" + status + " info:" + info);
 //                        } catch (JSONException e) {
 //                            e.printStackTrace();
 //                        }
 //                    }
-//                    Message message=new Message();
+//                    Message message = new Message();
 //                    if (status.equals("1") && info.equals("OK")) {
-//                        message.what=1;
-//                    }else{
-//                        message.what=-1;
+//                        message.what = 1;
+//                    } else {
+//                        message.what = -1;
 //                    }
 //                    handler.sendMessage(message);
 //                }
@@ -469,8 +555,8 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 //
 //                @Override
 //                public void onError(Exception e) {
-//                    Log.e("SharedFrag", e.getMessage());
-//                    status="0";
+//                    Log.e("LoginFrag", e.getMessage());
+//                    status = "0";
 //                }
 //            });
 //            return null;
@@ -478,64 +564,358 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 //
 //        @Override
 //        protected void onPreExecute() {
-//            super.onPreExecute();
+//            progressDialog = new ProgressDialog(getActivity());
+//            progressDialog.setMessage("正在注册,请稍候...");
+//            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//            progressDialog.setCancelable(false);
+//            progressDialog.show();
 //        }
 //
 //        @Override
-//        protected void onPostExecute(String s) {
+//        protected void onPostExecute(Void aVoid) {
+//            super.onPostExecute(aVoid);
 //        }
 //    }
+//=============================================================================================
+
+    private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
+        List<commentsPDM> commentsList=new ArrayList<>();
+        List<likesPDM> likesList=new ArrayList<>();
+        List<MarksPDM> marksList = new ArrayList<>();
+        for(int i=0;i<jsonArray.length();i++) {
+            try {
+                JSONObject marksObject = jsonArray.getJSONObject(i);
+                Log.i("SharedFrag:"+i+":obj:", marksObject.toString());
+
+                MarksPDM marksPDM = new MarksPDM();
+                marksPDM.setUserId(marksObject.getLong("userID"));
+                marksPDM.setMarkId(marksObject.getLong("markID"));
+                marksPDM.setPositionName(marksObject.getString("positionName"));
+                marksPDM.setLongitude(marksObject.getDouble("longitude"));
+                marksPDM.setLatitude(marksObject.getDouble("latitude"));
+                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
+                marksPDM.setContent(marksObject.getString("content"));
+                marksPDM.setPhoto(marksObject.getString("photo"));
+                marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
+                JSONArray commentsObject = marksObject.getJSONArray("comments");
+                for(int j=0;j<commentsObject.length();j++) {
+                    JSONObject comment = commentsObject.getJSONObject(j);
+                    Log.i("SharedFrag:" + i + ":com:", comment.toString());
+
+                    commentsPDM commentsPDM=new commentsPDM();
+                    commentsPDM.setCommentId(comment.getLong("commentId"));
+                    commentsPDM.setMarkId(comment.getLong("markID"));
+                    commentsPDM.setFriendId(comment.getLong("friendID"));
+                    commentsPDM.setFriendName(comment.getString("friendName"));
+                    commentsPDM.setContent(comment.getString("content"));
+                    commentsPDM.setCommentTime((Timestamp) comment.get("commentTime"));
+                    commentsList.add(commentsPDM);
+                }
+                JSONArray likesObject = marksObject.getJSONArray("likes");
+                for (int k=0;k<likesObject.length();k++) {
+                    JSONObject like = likesObject.getJSONObject(k);
+                    Log.i("SharedFrag:" + i + ":like:", like.toString());
+
+                    likesPDM likesPDM = new likesPDM();
+                    likesPDM.setLikeId(like.getLong("likeID"));
+                    likesPDM.setUserId(like.getLong("friendID"));
+                    likesPDM.setMarkId(like.getLong("markID"));
+                    likesPDM.setUserName(like.getString("friendName"));//服务器那边没有给这个值。。。要协商
+                    likesList.add(likesPDM);
+                }
+                marksPDM.setComments(commentsList);
+                marksPDM.setLikes(likesList);
+                marksList.add(marksPDM);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    //============================================================================
+    //添加朋友关系
+//    private static final String serviceUrl="http://119.29.166.177:8080/createRelation";
+//    private Handler handler = new Handler(){
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case 1:
+//                        Toast.makeText(getActivity(),"添加好友成功",Toast.LENGTH_SHORT).show();
+//                          getActivity().finish();//这里添加成功后直接结束活动也可以。
+//                    break;
+//                case -1:
+//                    Toast.makeText(getActivity(),"添加好友失败……",Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        }
+//    };
+
+    //    //这里需要传入userID 和 friendID  类型都为long。还有关系relation 好友关系为 0，
+//    // 方法：long friendID;
+//    //long userID;
 //
-//    private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
-//        MarksPDM marksPDM;
-//        List<commentsPDM> commentsList=new ArrayList<>();
-//        List<likesPDM> likesList=new ArrayList<>();
-//        List<MarksPDM> marksList = new ArrayList<>();
-//        for(int i=0;i<jsonArray.length();i++) {
+//    JSONObject object = new JSONObject();
+//    object.put("userID", userID);
+//    object.put("markID", friendID);
+//    object.put("relation",0);
+
+//    //new addFriend().execute(object);//调用这个异步类的时候，直接把上面的jsonobject传入即可
+//    private class addFriend extends AsyncTask<JSONObject, Void, Void> {
+//        private String status;
+//        private String info;
+//        @Override
+//        protected Void doInBackground(JSONObject... params) {
+//
+//            HttpUtil.getJsonArrayByHttp(serviceUrl,params[0], new HttpCallbackListener() {
+//                @Override
+//                public void onFinishGetJson(JSONObject jsonObject) {
+//                    if (jsonObject == null) {
+//                        Log.i("status", "json:null");
+//                    } else if (jsonObject != null) {
+//                        try {
+//                            status = jsonObject.getString("status");
+//                            info = jsonObject.getString("info");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    Message message = new Message();
+//                    if (status.equals("1") && info.equals("OK")) {
+//                        message.what = 1;
+//                    } else {
+//                        message.what = -1;
+//                    }
+//                    handler.sendMessage(message);
+//                }
+//
+//                @Override
+//                public void onFinishGetString(String response) {
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("LoginFrag", e.getMessage());
+//                    status = "0";
+//                }
+//            });
+//            return null;
+//        }
+//    }
+
+
+
+
+
+    //======================================================================================
+    //添加评论的请求
+//    private static final String serviceUrl="http://119.29.166.177:8080/addComment";
+//    private Handler handler = new Handler(){
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case 1:
+//                        //这里加上在本地的添加朋友圈评论的事件就可以了
+//                        Toast.makeText(getActivity(),"添加评论成功",Toast.LENGTH_SHORT).show();
+//
+//                    break;
+//                case -1:
+//                    Toast.makeText(getActivity(),"添加评论失败……",Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        }
+//    };
+
+    //    //这里需要传入userID 和 markID 还有String 评论，类型都为long。
+//    // 方法：long markID;
+//    //long userID;
+//    //String content;
+//    JSONObject object = new JSONObject();
+//    object.put("userID", userID);
+//    object.put("markID", markID);
+//    object.put("content",content);
+
+//    //new addComment().execute(object);//调用这个异步类的时候，直接把上面的jsonobject传入即可
+//    private class addComment extends AsyncTask<JSONObject, Void, Void> {
+//        private String status;
+//        private String info;
+//        @Override
+//        protected Void doInBackground(JSONObject... params) {
+//
+//            HttpUtil.getJsonArrayByHttp(serviceUrl,params[0], new HttpCallbackListener() {
+//                @Override
+//                public void onFinishGetJson(JSONObject jsonObject) {
+//                    if (jsonObject == null) {
+//                        Log.i("status", "json:null");
+//                    } else if (jsonObject != null) {
+//                        try {
+//                            status = jsonObject.getString("status");
+//                            info = jsonObject.getString("info");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    Message message = new Message();
+//                    if (status.equals("1") && info.equals("OK")) {
+//                        message.what = 1;
+//                    } else {
+//                        message.what = -1;
+//                    }
+//                    handler.sendMessage(message);
+//                }
+//
+//                @Override
+//                public void onFinishGetString(String response) {
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("LoginFrag", e.getMessage());
+//                    status = "0";
+//                }
+//            });
+//            return null;
+//        }
+//    }
+
+
+
+
+    //=======================================================================================
+    //添加赞的请求
+//    private static final String serviceUrl="http://119.29.166.177:8080/addLike";
+//    private Handler handler = new Handler(){
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case 1:
+//                        //这里加上在本地的添加朋友圈赞的事件就可以了
+//                        Toast.makeText(getActivity(),"添加赞成功",Toast.LENGTH_SHORT).show();
+//
+//                    break;
+//                case -1:
+//                    Toast.makeText(getActivity(),"添加赞失败……",Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        }
+//    };
+
+//    //这里需要传入userID 和 markID，类型都为long。
+//    // 方法：long markID;
+//    //long userID;
+//    //new addLike().execute(userID, markID);
+//    private class addLike extends AsyncTask<Long, Void, Void> {
+//        private String status;
+//        private String info;
+//        @Override
+//        protected Void doInBackground(Long... params) {
+//            JSONObject object = new JSONObject();
 //            try {
-//                JSONObject marksObject = jsonArray.getJSONObject(i);
-//
-//                marksPDM = new MarksPDM();
-//                marksPDM.setUserId(marksObject.getLong("userID"));
-//                marksPDM.setMarkId(marksObject.getLong("markID"));
-//                marksPDM.setPositionName(marksObject.getString("positionName"));
-//                marksPDM.setAddress(marksObject.getString("address"));
-//                marksPDM.setLongitude(marksObject.getDouble("longitude"));
-//                marksPDM.setLatitude(marksObject.getDouble("latitude"));
-//                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
-//                marksPDM.setContent(marksObject.getString("content"));
-//                marksPDM.setPhoto(marksObject.getString("photo"));
-//                marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
-//                JSONArray commentsObject = marksObject.getJSONArray("comments");
-//                for(int j=0;j<commentsObject.length();j++) {
-//                    JSONObject comment = commentsObject.getJSONObject(j);
-//
-//                    commentsPDM commentsPDM=new commentsPDM();
-//                    commentsPDM.setCommentId(comment.getLong("commentId"));
-//                    commentsPDM.setMarkId(comment.getLong("markID"));
-//                    commentsPDM.setFriendId(comment.getLong("friendID"));
-//                    commentsPDM.setFriendName(comment.getString("friendName"));
-//                    commentsPDM.setContent(comment.getString("content"));
-//                    commentsPDM.setCommentTime((Timestamp) comment.get("commentTime"));
-//                    commentsList.add(commentsPDM);
-//                }
-//                JSONArray likesObject = marksObject.getJSONArray("likes");
-//                for (int k=0;k<likesObject.length();k++) {
-//                    JSONObject like = likesObject.getJSONObject(k);
-//
-//                    likesPDM likesPDM = new likesPDM();
-//                    likesPDM.setLikeId(like.getLong("likeID"));
-//                    likesPDM.setUserId(like.getLong("friendID"));
-//                    likesPDM.setMarkId(like.getLong("markID"));
-//                    likesPDM.setUserName(like.getString("friendName"));
-//                    likesList.add(likesPDM);
-//                }
-//                marksPDM.setComments(commentsList);
-//                marksPDM.setLikes(likesList);
-//                marksList.add(marksPDM);
+//                object.put("userID",params[0]);//////记得参数的顺序不要弄乱了，第一个为userID，第二个为markID
+//                object.put("markID", params[1]);
 //            } catch (JSONException e) {
 //                e.printStackTrace();
 //            }
+//            HttpUtil.getJsonArrayByHttp(serviceUrl,object, new HttpCallbackListener() {
+//                @Override
+//                public void onFinishGetJson(JSONObject jsonObject) {
+//                    if (jsonObject == null) {
+//                        Log.i("status", "json:null");
+//                    } else if (jsonObject != null) {
+//                        try {
+//                            status = jsonObject.getString("status");
+//                            info = jsonObject.getString("info");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    Message message = new Message();
+//                    if (status.equals("1") && info.equals("OK")) {
+//                        message.what = 1;
+//                    } else {
+//                        message.what = -1;
+//                    }
+//                    handler.sendMessage(message);
+//                }
+//
+//                @Override
+//                public void onFinishGetString(String response) {
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("LoginFrag", e.getMessage());
+//                    status = "0";
+//                }
+//            });
+//            return null;
+//        }
+//    }
+
+    //======================================================================================
+    //删除朋友圈的一条
+//    private static final String serviceUrl="http://119.29.166.177:8080/deleteMark;
+//    private Handler handler = new Handler(){
+//        public void handleMessage(Message msg) {
+//            switch (msg.what) {
+//                case 1:
+//                        //这里加上在本地的删除朋友圈的事件就可以了
+//                        Toast.makeText(getActivity(),"删除朋友圈成功",Toast.LENGTH_SHORT).show();
+//
+//                    break;
+//                case -1:
+//                    Toast.makeText(getActivity(),"删除朋友圈失败……",Toast.LENGTH_SHORT).show();
+//                    break;
+//            }
+//        }
+//    };
+//
+//    //这里需要传入markID，类型为long。 方法：new deleteMark().execute(markId);
+//    private class deleteMark extends AsyncTask<Long, Void, Void> {
+//        private String status;
+//        private String info;
+//        @Override
+//        protected Void doInBackground(Long... params) {
+//            JSONObject object = new JSONObject();
+//            try {
+//                object.put("markID", params[0]);
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//            HttpUtil.getJsonArrayByHttp(serviceUrl,object, new HttpCallbackListener() {
+//                @Override
+//                public void onFinishGetJson(JSONObject jsonObject) {
+//                    if (jsonObject == null) {
+//                        Log.i("status", "json:null");
+//                    } else if (jsonObject != null) {
+//                        try {
+//                            status = jsonObject.getString("status");
+//                            info = jsonObject.getString("info");
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    Message message = new Message();
+//                    if (status.equals("1") && info.equals("OK")) {
+//                        message.what = 1;
+//                    } else {
+//                        message.what = -1;
+//                    }
+//                    handler.sendMessage(message);
+//                }
+//
+//                @Override
+//                public void onFinishGetString(String response) {
+//
+//                }
+//
+//                @Override
+//                public void onError(Exception e) {
+//                    Log.e("LoginFrag", e.getMessage());
+//                    status = "0";
+//                }
+//            });
+//            return null;
 //        }
 //    }
 }

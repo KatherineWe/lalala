@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-        //saveUserInfo();//启用后台获取数据库中用户的数据
+        saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
     @Override
@@ -363,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         };
-        new saveUserInfos().execute(connection);
+//        new saveUserInfos().execute(connection);
     }
 
     private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
@@ -371,11 +371,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         protected String doInBackground(ServiceConnection... params) {
             Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
             bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             return null;
         }
 
