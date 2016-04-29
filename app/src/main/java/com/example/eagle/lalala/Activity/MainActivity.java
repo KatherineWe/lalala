@@ -80,10 +80,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fab_add;
     @Bind(R.id.fab_camera)
     FloatingActionButton fab_camera;
-
     @Bind(R.id.menu_button)
     FloatingActionMenu menuButton;
-
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @Bind(R.id.navigation_view)
@@ -108,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-        saveUserInfo();//启用后台获取数据库中用户的数据
+        //saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
     @Override
