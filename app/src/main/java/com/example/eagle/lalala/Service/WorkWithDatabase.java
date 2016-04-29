@@ -79,7 +79,7 @@ public class WorkWithDatabase extends Service {
 
                     }
                 }).start();
-
+            db.close();
         }
 
         public void upDateUserInfo(Context context, final HashMap<String, Object> userInfo) {
@@ -130,7 +130,7 @@ public class WorkWithDatabase extends Service {
                     }
                 }
             }).start();
-
+            db.close();
         }
     }
 

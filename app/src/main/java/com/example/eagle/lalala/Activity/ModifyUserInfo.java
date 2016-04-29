@@ -79,9 +79,11 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                     }
                     progressDialog.dismiss();
                     Toast.makeText(ModifyUserInfo.this,"上传成功！",Toast.LENGTH_SHORT).show();
+                    unbindService(connection);
                     ModifyUserInfo.this.finish();
                     break;
                 case -1:
+                    progressDialog.dismiss();
                     Toast.makeText(ModifyUserInfo.this,"上传失败！",Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -133,19 +135,20 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                 IconChoosePhotoDialog();
                 break;
             case R.id.modify_nickname_layout:
-                showEditStringDialog("昵称");
+                showEditStringDialog("昵称",1);
                 break;
             case R.id.modify_signature_layout:
-                showEditStringDialog("签名");
+                showEditStringDialog("签名",2);
 
                 break;
         }
     }
 
-    public void showEditStringDialog(String title)
+    public void showEditStringDialog(String title,int i)
     {
         Bundle bundle=new Bundle();
         bundle.putString("title",title);
+        bundle.putInt("flag",i);
         DialogEditUserString dialog = new DialogEditUserString();
         dialog.setArguments(bundle);
         dialog.show(getFragmentManager(),title);
@@ -153,9 +156,14 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
     }
 
     @Override
-    public void onEditInputComplete(String info) {
+    public void onEditInputComplete(String info,int i) {
         if (info != null) {
-            Toast.makeText(ModifyUserInfo.this, info, Toast.LENGTH_SHORT).show();
+
+            if (i == 1) {
+                nickNameTv.setText(info);
+            }else{
+                signatureTv.setText(info);
+            }
         } else {
             Toast.makeText(ModifyUserInfo.this, "请输入内容…", Toast.LENGTH_SHORT).show();
         }
@@ -275,18 +283,18 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                         //4.4及以上系统使用这个方法处理图片
                         imageCamera= TakePicture.handleImageOnKitKat(ModifyUserInfo.this, data);
                         backgroundFile = new File(imageCamera);
-                        Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 240, 360);
+                        Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 120, 240);
                         backgroundIv.setImageBitmap(bitmap1);
                     }else{
                         //4.4以下系统使用这个方法处理图片
                         imageCamera = TakePicture.handleImageBeforeKitKat(ModifyUserInfo.this, data);
                         backgroundFile = new File(imageCamera);
-                        Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 240, 360);
+                        Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 120, 240);
                         backgroundIv.setImageBitmap(bitmap1);
                     }
                 break;
             case BackgroundCROP_PHOTO:
-                Bitmap bitmap3 = HandlePicture.decodeSampleBitmapFromPath(backgroundFile.getAbsolutePath(), 240, 360);
+                Bitmap bitmap3 = HandlePicture.decodeSampleBitmapFromPath(backgroundFile.getAbsolutePath(), 120, 240);
                 backgroundIv.setImageBitmap(bitmap3);
                 break;
             case IconTAKE_PHOTO:
@@ -321,7 +329,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onDestroy() {
-        unbindService(connection);
+//        unbindService(connection);
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
