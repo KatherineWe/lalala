@@ -364,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         };
-//        new saveUserInfos().execute(connection);
+        new saveUserInfos().execute(connection);
     }
 
     private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
