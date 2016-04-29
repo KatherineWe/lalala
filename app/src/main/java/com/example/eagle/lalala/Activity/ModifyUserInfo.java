@@ -377,6 +377,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.i("Modify::", object.toString());
                 new ModifyInfo().execute(object);//用异步处理上传操作
             } else {
                 Toast.makeText(ModifyUserInfo.this, "邮箱为空，请重新登陆…", Toast.LENGTH_SHORT).show();

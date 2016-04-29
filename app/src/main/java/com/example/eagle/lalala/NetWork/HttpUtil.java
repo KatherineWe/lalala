@@ -1,5 +1,6 @@
 package com.example.eagle.lalala.NetWork;
 
+import android.text.LoginFilter;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -75,6 +76,7 @@ public class HttpUtil  {
 
                     DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
                     String jsonString=object.toString();//将json数据变成string类型
+                    Log.i("HttpUtil:object::", jsonString);
                     dataOutputStream.writeBytes(jsonString);//把json数据发送给服务器
                     dataOutputStream.flush();
                     dataOutputStream.close();
