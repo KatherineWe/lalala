@@ -1,6 +1,7 @@
 package com.example.eagle.lalala.PDM;
 
 import com.example.eagle.lalala.NetWork.HttpUtil;
+import com.example.eagle.lalala.PictureWork.HandlePicture;
 
 /**
  * Created by NeilHY on 2016/4/24.

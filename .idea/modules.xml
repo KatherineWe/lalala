@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/floatingbutton_library/floatingbutton_library.iml" filepath="$PROJECT_DIR$/floatingbutton_library/floatingbutton_library.iml" />
       <module fileurl="file://$PROJECT_DIR$/lalala.iml" filepath="$PROJECT_DIR$/lalala.iml" />
+      <module fileurl="file://$PROJECT_DIR$/lalala2.iml" filepath="$PROJECT_DIR$/lalala2.iml" />
       <module fileurl="file://$PROJECT_DIR$/pulltorefresh-lib/pulltorefresh-lib.iml" filepath="$PROJECT_DIR$/pulltorefresh-lib/pulltorefresh-lib.iml" />
     </modules>
   </component>
