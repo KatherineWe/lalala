@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         init();
-        //saveUserInfo();//启用后台获取数据库中用户的数据
+        saveUserInfo();//启用后台获取数据库中用户的数据
     }
 
     @Override
@@ -122,15 +122,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mFavoriteFragment = new SharedFragment();
 
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.single_frag_container,mRecommendedFragment,"recommended_frag")
+               // .add(R.id.single_frag_container,mRecommendedFragment,"recommended_frag")
                 .add(R.id.single_frag_container,mMapFrgment,"map_frag")
-                .add(R.id.single_frag_container,mFocusedFragment,"focused_frag")
-                .add(R.id.single_frag_container,mFavoriteFragment,"favorite_frag")
-                .add(R.id.single_frag_container,mPostedFragment,"posted_frag")
-                .hide(mFavoriteFragment)
-                .hide(mPostedFragment)
-                .hide(mRecommendedFragment)
-                .hide(mFocusedFragment)
+//                .add(R.id.single_frag_container,mFocusedFragment,"focused_frag")
+//                .add(R.id.single_frag_container,mFavoriteFragment,"favorite_frag")
+//                .add(R.id.single_frag_container,mPostedFragment,"posted_frag")
+//                .hide(mFavoriteFragment)
+//                .hide(mPostedFragment)
+//                .hide(mRecommendedFragment)
+//                .hide(mFocusedFragment)
                 .commit();
 
         RelativeLayout drawerHeaderLayout= (RelativeLayout) mNavigationView.getHeaderView(0);
@@ -152,12 +152,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Toast.makeText(MainActivity.this,"message",Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.menu_favorite:
-                        CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"favorite_frag");
-                        DatasUtil.mCurrentFragment = "favorite_frag";
+                      //  CommonUtils.changeFrag(MainActivity.this,"favorite_frag");
                         break;
                     case R.id.menu_posted:
-                        CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"posted_frag");
-                        DatasUtil.mCurrentFragment = "posted_frag";
+                      //  CommonUtils.changeFrag(MainActivity.this,"posted_frag");
                         break;
                     case R.id.menu_setting:
 
@@ -265,19 +263,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.textView_title_map:
-                CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"map_frag");
-                DatasUtil.mCurrentFragment = "map_frag";
-                //changeFrag(getSupportFragmentManager().findFragmentByTag("list_frag"),getSupportFragmentManager().findFragmentByTag("map_frag"));
+                CommonUtils.changeFrag(MainActivity.this,"map_frag");
                 break;
             case R.id.textView_title_list:
-               // CommonUtils.changeFrag(MainActivity.this,mMapFrgment,mRecommendedFragment);
-                //changeFrag(getSupportFragmentManager().findFragmentByTag("map_frag"),getSupportFragmentManager().findFragmentByTag("list_frag"));
-                CommonUtils.changeFrag(MainActivity.this, DatasUtil.mCurrentFragment,"recommended_frag");
-                DatasUtil.mCurrentFragment = "recommended_frag";
+                CommonUtils.changeFrag(MainActivity.this,"recommended_frag");
                 break;
-//            case R.id.btn_info_in_MainActivity:
-//                startActivity(new Intent(MainActivity.this, InfoActivity.class));
-//                break;
             case R.id.btn_contacts_in_MainActivity:
                 startActivity(new Intent(MainActivity.this,ContactActivity.class));
                 break;
@@ -347,33 +337,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        connection=new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
-                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
-//                accessDatabaseBinder.saveUserInfo(MainActivity.this);
-
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        };
-        new saveUserInfos().execute(connection);
+//        connection=new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
+//                accessDatabaseBinder.saveUserInfo(MainActivity.this,userInfo);
+////                accessDatabaseBinder.saveUserInfo(MainActivity.this);
+//
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//
+//            }
+//        };
+        new saveUserInfos().execute(userInfo);
     }
 
-    private class saveUserInfos extends AsyncTask<ServiceConnection, Void, String> {
+    private class saveUserInfos extends AsyncTask<HashMap<String,Object>, Void, String> {
         @Override
-        protected String doInBackground(ServiceConnection... params) {
+        protected String doInBackground(HashMap<String,Object>... params) {
             Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
             bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
             return null;
         }
 

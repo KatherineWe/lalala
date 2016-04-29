@@ -80,9 +80,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
     private CirclePresenter mPresenter;
     private CommentConfig mCommentConfig;
-    //    private JSONArray jsonArray;
     private JSONArray MarksjsonArray;
-    private PtrFrameLayout ptrFrameLayout;
 
 
     private Handler handler = new Handler(){
@@ -99,7 +97,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                     Toast.makeText(getActivity(),"刷新朋友圈列表失败……",Toast.LENGTH_SHORT).show();
                     break;
             }
-            ptrFrameLayout.refreshComplete();
+            mPtrFrameLayout.refreshComplete();
 
         }
     };
@@ -166,8 +164,8 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 //                        frame.refreshComplete();
 //                    }
 //                }, 2000);
-                ptrFrameLayout=frame;
-                new FreshMarks().execute(frame);
+//                ptrFrameLayout = frame;
+                new FreshMarks().execute();
             }
         });
 
@@ -229,12 +227,10 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_recommend:
-                CommonUtils.changeFrag(getActivity(), DatasUtil.mCurrentFragment,"recommended_frag");
-                DatasUtil.mCurrentFragment = "recommended_frag";
+                CommonUtils.changeFrag(getActivity(),"recommended_frag");
                 break;
             case R.id.btn_focus:
-                CommonUtils.changeFrag(getActivity(), DatasUtil.mCurrentFragment,"focused_frag");
-                DatasUtil.mCurrentFragment = "focused_frag";
+                CommonUtils.changeFrag(getActivity(),"focused_frag");
                 break;
         }
     }
@@ -412,7 +408,6 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
     /**
      * 获取状态栏高度
-     *
      * @return
      */
     private int getStatusBarHeight() {
@@ -425,8 +420,8 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     }
 
     private void loadData() {
-        List<CircleItem> datas = DatasUtil.createCircleDatas();
-        mAdapter.setDatas(datas);
+//        List<CircleItem> datas = DatasUtil.createCircleDatas();
+//        mAdapter.setDatas(datas);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -489,99 +484,10 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         }
     }
 
-//==================================================================================
-    //获取自己朋友圈的异步类
-//    private static final String serviceUrl="http://119.29.166.177:8080/getMyMarks;
-//    private ProgressDialog progressDialog;
-//    private JSONArray MarksjsonArray;
-//    private Handler handler = new Handler(){
-//        public void handleMessage(Message msg) {
-//            switch (msg.what) {
-//                case 1:
-//                    if (MarksjsonArray != null) {//不知道用jsonArray去接受的话，会报错，先调试用jsonobject去接收，等我找出原因先。
-//                        makeMarksList(MarksjsonArray);
-//                        Log.i("SharedFrag:Array::", MarksjsonArray.toString());
-//                        Toast.makeText(getActivity(),"刷新朋友圈列表成功",Toast.LENGTH_SHORT).show();
-//                    }
-//                    break;
-//                case -1:
-//                    Toast.makeText(getActivity(),"刷新朋友圈列表失败……",Toast.LENGTH_SHORT).show();
-//                    break;
-//            }
-//              progressDialog.dismiss();
-//        }
-//    };
-//
-//    private class getMyMarks extends AsyncTask<Void, Void, Void> {
-//        private String status;
-//        private String info;
-//        @Override
-//        protected Void doInBackground(Void... params) {
-//            JSONObject object = new JSONObject();
-//            try {
-//                object.put("userID", MainActivity.userId);
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//            HttpUtil.getJsonArrayByHttp(serviceUrl,object, new HttpCallbackListener() {
-//                @Override
-//                public void onFinishGetJson(JSONObject jsonObject) {
-//                    if (jsonObject == null) {
-//                        Log.i("status", "json:null");
-//                    } else if (jsonObject != null) {
-//                        try {
-//                            Log.i("status", "json:" + jsonObject.toString());
-//                            status = jsonObject.getString("status");
-//                            info = jsonObject.getString("info");
-//                            MarksjsonArray=jsonObject.getJSONArray("marks");
-//                            Log.i("status1", "status:" + status + " info:" + info);
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    Message message = new Message();
-//                    if (status.equals("1") && info.equals("OK")) {
-//                        message.what = 1;
-//                    } else {
-//                        message.what = -1;
-//                    }
-//                    handler.sendMessage(message);
-//                }
-//
-//                @Override
-//                public void onFinishGetString(String response) {
-//
-//                }
-//
-//                @Override
-//                public void onError(Exception e) {
-//                    Log.e("LoginFrag", e.getMessage());
-//                    status = "0";
-//                }
-//            });
-//            return null;
-//        }
-//
-//        @Override
-//        protected void onPreExecute() {
-//            progressDialog = new ProgressDialog(getActivity());
-//            progressDialog.setMessage("正在注册,请稍候...");
-//            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-//            progressDialog.setCancelable(false);
-//            progressDialog.show();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Void aVoid) {
-//            super.onPostExecute(aVoid);
-//        }
-//    }
-//=============================================================================================
-
     private void makeMarksList(JSONArray jsonArray) {//创建朋友圈列表
         List<commentsPDM> commentsList=new ArrayList<>();
         List<likesPDM> likesList=new ArrayList<>();
-        List<MarksPDM> marksList = new ArrayList<>();
+       // List<MarksPDM> marksList = new ArrayList<>();
         for(int i=0;i<jsonArray.length();i++) {
             try {
                 JSONObject marksObject = jsonArray.getJSONObject(i);
@@ -593,7 +499,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 marksPDM.setPositionName(marksObject.getString("positionName"));
                 marksPDM.setLongitude(marksObject.getDouble("longitude"));
                 marksPDM.setLatitude(marksObject.getDouble("latitude"));
-                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
+                marksPDM.setCreateTime(new Timestamp((long) marksObject.get("createTime")));
                 marksPDM.setContent(marksObject.getString("content"));
                 marksPDM.setPhoto(marksObject.getString("photo"));
                 marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
@@ -625,7 +531,8 @@ public class SharedFragment extends ListFragment implements  ICircleView {
                 }
                 marksPDM.setComments(commentsList);
                 marksPDM.setLikes(likesList);
-                marksList.add(marksPDM);
+               // marksList.add(marksPDM);
+                DatasUtil.sMarksPDMs_public.add(marksPDM);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

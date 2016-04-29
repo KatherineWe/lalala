@@ -15,13 +15,13 @@ public class MarksPDM {
     private long userId;
     private long markId;
     private Timestamp createTime;
+    private Authorities authority;
     private double longitude;
     private double latitude;
     private String positionName;
     private String address;
     private String content;
     private Bitmap photo;
-    private Authorities authority;
     private List<commentsPDM> comments;
     private List<likesPDM> likes;
 
@@ -41,6 +41,20 @@ public class MarksPDM {
         this.authority = authority;
         this.comments = comments;
         this.likes = likes;
+    }
+
+    public boolean hasFavort() {
+        if (likes != null && likes.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean hasComment() {
+        if (comments != null && comments.size() > 0) {
+            return true;
+        }
+        return false;
     }
 
     public long getUserId() {

@@ -1,6 +1,8 @@
 package com.example.eagle.lalala.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,6 +16,9 @@ import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.ImagePagerActivity;
 import com.example.eagle.lalala.MyApplication;
+import com.example.eagle.lalala.PDM.MarksPDM;
+import com.example.eagle.lalala.PDM.commentsPDM;
+import com.example.eagle.lalala.PDM.likesPDM;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.bean.ActionItem;
 import com.example.eagle.lalala.bean.CircleItem;
@@ -32,6 +37,7 @@ import com.example.eagle.lalala.widgets.dialog.CommentDialog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,21 +50,21 @@ import java.util.List;
 public class CircleAdapter extends BaseAdapter {
     private Context mContext;
     private CirclePresenter mPresenter;
-    private List<CircleItem> datas = new ArrayList<CircleItem>();
+    //private List<CircleItem> datas = new ArrayList<CircleItem>();
 
     public void setCirclePresenter(CirclePresenter presenter) {
         mPresenter = presenter;
     }
 
-    public List<CircleItem> getDatas() {
-        return datas;
-    }
+//    public List<CircleItem> getDatas() {
+//        return datas;
+//    }
 
-    public void setDatas(List<CircleItem> datas) {
-        if (datas != null) {
-            this.datas = datas;
-        }
-    }
+//    public void setDatas(List<CircleItem> datas) {
+//        if (datas != null) {
+//            this.datas = datas;
+//        }
+//    }
 
     public CircleAdapter(Context context) {
         mContext = context;
@@ -66,12 +72,12 @@ public class CircleAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return datas.size();
+        return DatasUtil.sMarksPDMs_public.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return datas.get(position);
+        return DatasUtil.sMarksPDMs_public.get(position);
     }
 
     @Override
@@ -93,7 +99,6 @@ public class CircleAdapter extends BaseAdapter {
             holder.digLine = convertView.findViewById(R.id.lin_dig);
 
             holder.contentTv = (TextView) convertView.findViewById(R.id.contentTv);
-           // holder.urlTipTv = (TextView) convertView.findViewById(R.id.urlTipTv);
             holder.locationTv = (TextView) convertView.findViewById(R.id.locationTv);
             holder.timeTv = (TextView) convertView.findViewById(R.id.timeTv);
             holder.deleteBtn = (TextView) convertView.findViewById(R.id.deleteBtn);
@@ -117,15 +122,16 @@ public class CircleAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        CircleItem circleItem = datas.get(position);
-        final String circleId = circleItem.getId();
+        MarksPDM circleItem = DatasUtil.sMarksPDMs_public.get(position);
+        //CircleItem circleItem = datas.get(position);
+        final long circleId = circleItem.getUserId();
         String name = circleItem.getUser().getName();
         String headImg = circleItem.getUser().getHeadUrl();
-        final String mainImg = circleItem.getPhoto();
+        final Bitmap mainImg = circleItem.getPhoto();
         String content = circleItem.getContent();
-        String createTime = circleItem.getCreateTime();
-        final List<FavortItem> favortDatas = circleItem.getFavorters();
-        final List<CommentItem> commentsDatas = circleItem.getComments();
+        String createTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(circleItem.getCreateTime());
+        final List<likesPDM> favortDatas = circleItem.getLikes();
+        final List<commentsPDM> commentsDatas = circleItem.getComments();
         boolean hasFavort = circleItem.hasFavort();
         boolean hasComment = circleItem.hasComment();
 

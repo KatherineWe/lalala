@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.example.eagle.lalala.Fragment.SharedFragment;
 import com.example.eagle.lalala.R;
 
 /**
@@ -35,15 +36,28 @@ public class CommonUtils {
         return imm.isActive();//true 打开
     }
 
-    public static void changeFrag(FragmentActivity context, String fromTag, String toTag) {
+    public static void changeFrag(FragmentActivity context, String toTag) {
         if(toTag == DatasUtil.mCurrentFragment)
             return;
         FragmentTransaction transaction = context.getSupportFragmentManager().beginTransaction();
-        Fragment from = context.getSupportFragmentManager().findFragmentByTag(fromTag);
+        Fragment from = context.getSupportFragmentManager().findFragmentByTag(DatasUtil.mCurrentFragment);
         Fragment to = context.getSupportFragmentManager().findFragmentByTag(toTag);
-        if(!to.isAdded())
-            transaction.hide(from).add(R.id.single_frag_container, to).commit();
+        if(to == null) {
+            switch (toTag)
+            {
+                case "posted_frag":
+                    transaction.hide(from).add(R.id.single_frag_container,new SharedFragment(),toTag).commit();
+                    break;
+                case "focused_frag":
+                    transaction.hide(from).add(R.id.single_frag_container,new SharedFragment(),toTag).commit();
+                    break;
+                default:
+                    break;
+            }
+
+        }
         else
             transaction.hide(from).show(to).commit();
+        DatasUtil.mCurrentFragment = toTag;
     }
 }

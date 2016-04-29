@@ -1,6 +1,7 @@
 package com.example.eagle.lalala.utils;
 
 
+import com.example.eagle.lalala.PDM.MarksPDM;
 import com.example.eagle.lalala.bean.CircleItem;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.bean.FavortItem;
@@ -48,6 +49,8 @@ public class DatasUtil {
             "http://tse2.mm.bing.net/th?id=OIP.Maf3d0b615534fc34707a482f2fb80daao0&w=219&h=123&c=7&rs=1&qlt=90&o=4&pid=1.1",};
 
     public static List<CircleItem> circleDatas;
+
+    public static List<MarksPDM> sMarksPDMs_public;
 
     public static List<User> users = new ArrayList<User>();
     /**

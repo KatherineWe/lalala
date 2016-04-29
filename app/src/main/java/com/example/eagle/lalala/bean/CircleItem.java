@@ -6,12 +6,6 @@ import java.util.List;
 
 
 public class CircleItem extends BaseBean {
-
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-
     private String id;
     private String content;
     private String createTime;

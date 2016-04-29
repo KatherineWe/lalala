@@ -338,11 +338,6 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                     status="0";
                 }
             });
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
             return null;
         }
 
