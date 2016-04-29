@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.MainActivity;
@@ -38,18 +39,24 @@ public class WorkWithDatabase extends Service {
                     public void run() {
                         db.beginTransaction();
                         try {
-                            db.delete(WeMarkDatabaseHelper.USER_TABLE, null, null);//删除表的数据
+                            int i=db.delete(WeMarkDatabaseHelper.USER_TABLE, null, null);//删除表的数据
+                            Log.i("Database::", "delete "+i);
                             ContentValues values = new ContentValues();
                             boolean flag = false;
                             if ((long) userInfo.get("userId") != 0) {
                                 values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
                                 flag = true;//标志有userId，不为空才可以插入
+                                Log.i("Database:save:", "userId "+(long)userInfo.get("userId"));
+
                             }
                             if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
                                 values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                                Log.i("Database:save:", "email "+userInfo.get("email").toString());
+
                             }
                             if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
                                 values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                                Log.i("Database:save:", "userName "+userInfo.get("userName").toString());
                             }
                             if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
                                 values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
@@ -71,6 +78,7 @@ public class WorkWithDatabase extends Service {
                                 db.insert(WeMarkDatabaseHelper.USER_TABLE, null, values);
                             }
                             db.setTransactionSuccessful();
+                            Log.i("Database:save:", "transaction success");
                         } catch (Exception e) {
                         e.printStackTrace();
                     }finally {
@@ -96,12 +104,17 @@ public class WorkWithDatabase extends Service {
                         if ((long) userInfo.get("userId") != 0) {
                             values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
                             flag = true;//标志有userId，不为空才可以插入
+                            Log.i("Database::", "userId "+(long)userInfo.get("userId"));
                         }
                         if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
                             values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                            Log.i("Database::", "email "+userInfo.get("email").toString());
+
                         }
                         if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
                             values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                            Log.i("Database::", "userName "+userInfo.get("userName").toString());
+
                         }
                         if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
                             values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
@@ -123,6 +136,7 @@ public class WorkWithDatabase extends Service {
                             db.update(WeMarkDatabaseHelper.USER_TABLE, values, "userId=" + userInfo.get("userId"), null);
                         }
                         db.setTransactionSuccessful();
+                        Log.i("Database::", "transaction success ");
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {

@@ -36,6 +36,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -44,7 +45,7 @@ import java.util.ArrayList;
 public class Edit_marks_aty extends AppCompatActivity implements View.OnClickListener {
 
     private static final String serviceUrl="http://119.29.166.177:8080/createMark";
-    private static long userId= MainActivity.userId;//用户的id
+    private static final long userId= MainActivity.userId;//用户的id
     public static final int PICK_PHOTO=2;
     private static final int AUTHORITY_PUBLIC=0;
     private static final int AUTHORITY_PRIVATE=1;
@@ -196,10 +197,13 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                 JSONObject object = new JSONObject();
                 try {
                     object.put("userID", userId);           //用户的id
-                    object.put("content", editMarkContent.getText().toString());
-                    object.put("name", editMarkName.getText().toString());
-                    object.put("address", editMarkAddress.getText().toString());
-//                    object.put("photo", "asdfasdifjaonsdlfkajoidsgfanlksenfalsdhgfoiadshgnlasjdnbgf");
+                    try {
+                        object.put("content", new String(editMarkContent.getText().toString().getBytes(),"UTF-8"));
+                        object.put("name", new String(editMarkName.getText().toString().getBytes(),"UTF-8"));
+                        object.put("address", new String(editMarkAddress.getText().toString().getBytes(),"UTF-8"));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                     if (imageCamera != null) {
                         object.put("photo", HandlePicture.bitmapToString(imageCamera));
                     }
@@ -224,7 +228,6 @@ public class Edit_marks_aty extends AppCompatActivity implements View.OnClickLis
                     Log.i("Edit_json:GBK:", HttpUtil.toGBK_UTFString(object.get("address").toString()));
                     Log.i("Edit_json:::utf:::", HttpUtil.toUTFString(object.get("address").toString()));
                     Log.i("Edit_json:gb2312:", HttpUtil.toGb2312_UTFString(object.get("address").toString()));
-                    Log.i("Edit_json:::photo:", object.get("photo").toString());
                     Log.i("Edit_json:::name:::", object.get("name").toString());
                     Log.i("Edit_json:::authority:", object.get("authority").toString());
                 } catch (JSONException e) {

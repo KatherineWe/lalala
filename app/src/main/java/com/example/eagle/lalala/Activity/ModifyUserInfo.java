@@ -3,6 +3,8 @@ package com.example.eagle.lalala.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -42,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 /**
@@ -60,6 +63,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
     private TextView nickNameTv;
     private TextView emailTv;
     private TextView signatureTv;
+    private static final long userId=MainActivity.userId;
 
     private WorkWithDatabase.AccessDatabaseBinder accessDatabaseBinder;//对后台的绑定
     private ServiceConnection connection;
@@ -71,15 +75,15 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
-                    upDateUserInfo();
-                    try{
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    upDateUserInfo(userInfo);
+//                    try{
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
                     progressDialog.dismiss();
                     Toast.makeText(ModifyUserInfo.this,"上传成功！",Toast.LENGTH_SHORT).show();
-                    unbindService(connection);
+//                    unbindService(connection);
                     ModifyUserInfo.this.finish();
                     break;
                 case -1:
@@ -221,19 +225,29 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
         WeMarkDatabaseHelper databaseHelper = new WeMarkDatabaseHelper(ModifyUserInfo.this, "WeMark.db", null, 1);
         final SQLiteDatabase db=databaseHelper.getReadableDatabase();
         Cursor cursor = db.query(WeMarkDatabaseHelper.USER_TABLE, null, "userId=" + MainActivity.userId, null, null, null, null);
+        Log.i("Modify::getinfo:", "cursor started");
         if (cursor.moveToFirst()) {
             do {
                 if (cursor.getString(cursor.getColumnIndex("email")) != null) {
                     emailTv.setText(cursor.getString(cursor.getColumnIndex("email")));
+                    Log.i("Modify::getinfo:", cursor.getString(cursor.getColumnIndex("email")));
+                }else{
+                    Log.i("Modify::getinfo:", "email null");
                 }
                 if (cursor.getString(cursor.getColumnIndex("userName")) != null) {
                     nickNameTv.setText(cursor.getString(cursor.getColumnIndex("userName")));
+                    Log.i("Modify::getinfo:", cursor.getString(cursor.getColumnIndex("userName")));
+                }else{
+                    Log.i("Modify::getinfo:", "userName null");
                 }
                 if (cursor.getString(cursor.getColumnIndex("signature")) != null) {
                     signatureTv.setText(cursor.getString(cursor.getColumnIndex("signature")));
                 }
                 if (cursor.getString(cursor.getColumnIndex("password")) != null) {
                     password=cursor.getString(cursor.getColumnIndex("password"));
+                    Log.i("Modify::getinfo:", cursor.getString(cursor.getColumnIndex("password")));
+                }else{
+                    Log.i("Modify::getinfo:", "password null");
                 }
                 if (cursor.getString(cursor.getColumnIndex("icon")) != null&& !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
                     Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("icon")), 120, 240);
@@ -248,22 +262,76 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
         cursor.close();
     }
 
-    private void upDateUserInfo() {
-        connection=new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
-                accessDatabaseBinder.upDateUserInfo(ModifyUserInfo.this,userInfo);
-            }
+//    private void upDateUserInfo() {
+//        connection=new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                accessDatabaseBinder= (WorkWithDatabase.AccessDatabaseBinder) service;
+//                accessDatabaseBinder.upDateUserInfo(ModifyUserInfo.this,userInfo);
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//
+//            }
+//        };
+//        Intent bindIntent = new Intent(ModifyUserInfo.this, WorkWithDatabase.class);
+//        bindService(bindIntent, connection, BIND_AUTO_CREATE);//绑定服务
+//    }
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
+    public void upDateUserInfo(final HashMap<String, Object> userInfo) {
+        WeMarkDatabaseHelper databaseHelper = new WeMarkDatabaseHelper(ModifyUserInfo.this, "WeMark.db", null, 1);
+        final SQLiteDatabase db = databaseHelper.getWritableDatabase();
 
-            }
-        };
-        Intent bindIntent = new Intent(ModifyUserInfo.this, WorkWithDatabase.class);
-        bindService(bindIntent, connection, BIND_AUTO_CREATE);//绑定服务
+                db.beginTransaction();
+                try {
+                    ContentValues values = new ContentValues();
+                    boolean flag = false;
+                    if ((long) userInfo.get("userId") != 0) {
+                        values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
+                        flag = true;//标志有userId，不为空才可以插入
+                        Log.i("Database::", "userId "+(long)userInfo.get("userId"));
+                    }
+                    if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                        Log.i("Database::", "email "+userInfo.get("email").toString());
+
+                    }
+                    if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                        Log.i("Database::", "userName "+userInfo.get("userName").toString());
+
+                    }
+                    if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
+                    }
+                    if (userInfo.get("icon") != null && !userInfo.get("icon").toString().equals("")) {
+//                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("icon").toString());
+//                            values.put(WeMarkDatabaseHelper.ICON, HandlePicture.bitmapTobyte(bitmap));
+                        values.put(WeMarkDatabaseHelper.ICON, userInfo.get("icon").toString());
+                    }
+                    if (userInfo.get("background") != null && !userInfo.get("background").toString().equals("")) {
+//                            Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("background").toString());
+//                            values.put(WeMarkDatabaseHelper.BACKGROUND, HandlePicture.bitmapTobyte(bitmap));
+                        values.put(WeMarkDatabaseHelper.BACKGROUND, userInfo.get("background").toString());
+                    }
+                    if (userInfo.get("signature") != null) {
+                        values.put(WeMarkDatabaseHelper.SIGNATURE, userInfo.get("signature").toString());
+                    }
+                    if (flag) {
+                        db.update(WeMarkDatabaseHelper.USER_TABLE, values, "userId=" + userInfo.get("userId"), null);
+                    }
+                    db.setTransactionSuccessful();
+                    Log.i("Database::", "transaction success ");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    db.endTransaction();
+                }
+
+        db.close();
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -349,9 +417,17 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
 
                 JSONObject object = new JSONObject();
                 try {
-                    object.put("userID", MainActivity.userId);
-                    object.put("emailAddr", HttpUtil.toUTFString(emailTv.getText().toString()));
-                    object.put("userName", HttpUtil.toUTFString(nickNameTv.getText().toString()));
+                    String signature = null;
+                    String nickName=null;
+                    try {
+                        signature=new String(signatureTv.getText().toString().getBytes(),"UTF-8");
+                        nickName=new String(nickNameTv.getText().toString().getBytes(),"UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    object.put("userID", userId);
+                    object.put("emailAddr", emailTv.getText().toString());
+//                    object.put("userName", HttpUtil.toUTFString(nickNameTv.getText().toString()));
                     object.put("password", password);
                     if (((BitmapDrawable) iconIv.getDrawable()).getBitmap() != null) {
                         String icon = HandlePicture.bitmapToString(((BitmapDrawable) iconIv.getDrawable()).getBitmap());
@@ -362,22 +438,28 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                         String background = HandlePicture.bitmapToString(((BitmapDrawable) backgroundIv.getDrawable()).getBitmap());
                         object.put("background",background);
                     }
-                    object.put("signature", HttpUtil.toUTFString(signatureTv.getText().toString()));
+//                    object.put("signature", HttpUtil.toUTFString(signatureTv.getText().toString()));
+                        object.put("signature", signature);
+                        object.put("userName", nickName);
 
-                    userInfo.put("userId", MainActivity.userId);
+
+                    userInfo.put("userId", userId);
                     userInfo.put("email", emailTv.getText().toString());
-                    userInfo.put("userName", nickNameTv.getText().toString());
+
+                        userInfo.put("userName", nickName);
+                        userInfo.put("signature", signature);
+                    Log.i("Modify::userInfo:", nickName +"----"+ signature);
+
                     if (iconFile != null) {
                         userInfo.put("icon", iconFile.getAbsolutePath());
                     }
                     if (backgroundFile != null) {
                         userInfo.put("background",backgroundFile.getAbsolutePath());
                     }
-                    userInfo.put("signature", signatureTv.getText().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Log.i("Modify::", object.toString());
+                Log.i("Modify::object:", object.toString());
                 new ModifyInfo().execute(object);//用异步处理上传操作
             } else {
                 Toast.makeText(ModifyUserInfo.this, "邮箱为空，请重新登陆…", Toast.LENGTH_SHORT).show();
@@ -446,5 +528,7 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
 
         }
     }
+
+
 
 }

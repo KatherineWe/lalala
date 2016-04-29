@@ -167,7 +167,7 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 //                    }
 //                }, 2000);
                 ptrFrameLayout=frame;
-                new FreshMarks().execute(frame);
+                new FreshMarks().execute();
             }
         });
 
@@ -425,12 +425,12 @@ public class SharedFragment extends ListFragment implements  ICircleView {
     }
 
 
-    private class FreshMarks extends AsyncTask<PtrFrameLayout, Void, String> {
+    private class FreshMarks extends AsyncTask<Void, Void, String> {
         private String status;
         private String info;
 
         @Override
-        protected String doInBackground(PtrFrameLayout... params) {
+        protected String doInBackground(Void... params) {
             JSONObject object = new JSONObject();
             try {
                 object.put("userID", MainActivity.userId);
@@ -583,11 +583,13 @@ public class SharedFragment extends ListFragment implements  ICircleView {
 
                 MarksPDM marksPDM = new MarksPDM();
                 marksPDM.setUserId(marksObject.getLong("userID"));
+                marksPDM.setUserName(marksObject.getString("userName"));
+                marksPDM.setIcon(marksObject.getString("icon"));
                 marksPDM.setMarkId(marksObject.getLong("markID"));
                 marksPDM.setPositionName(marksObject.getString("positionName"));
                 marksPDM.setLongitude(marksObject.getDouble("longitude"));
                 marksPDM.setLatitude(marksObject.getDouble("latitude"));
-                marksPDM.setCreateTime((Timestamp) marksObject.get("createTime"));
+                marksPDM.setCreateTime( new Timestamp((long)marksObject.get("createTime")));
                 marksPDM.setContent(marksObject.getString("content"));
                 marksPDM.setPhoto(marksObject.getString("photo"));
                 marksPDM.setAuthority(Authorities.values()[marksObject.getInt("authority")]);
