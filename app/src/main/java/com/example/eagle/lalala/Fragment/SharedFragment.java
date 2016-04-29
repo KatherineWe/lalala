@@ -299,13 +299,17 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         measureCircleItemHighAndCommentItemOffset(commentConfig);
 
         if (View.VISIBLE == visibility) {
+            getActivity().findViewById(R.id.menu_button).setVisibility(View.GONE);
             mEditText.requestFocus();
             //弹出键盘
             CommonUtils.showSoftInput(mEditText.getContext(), mEditText);
 
+
         } else if (View.GONE == visibility) {
             //隐藏键盘
+
             CommonUtils.hideSoftInput(mEditText.getContext(), mEditText);
+            getActivity().findViewById(R.id.menu_button).setVisibility(View.VISIBLE);
         }
     }
 
@@ -319,7 +323,9 @@ public class SharedFragment extends ListFragment implements  ICircleView {
         if (commentConfig == null)
             return 0;
         //这里如果你的listview上面还有其它占高度的控件，则需要减去该控件高度，listview的headview除外。
-        int listviewOffset = mScreenHeight - mSelectCircleItemH - mCurrentKeyboardH - mEditTextBodyHeight;
+
+        int listviewOffset = mScreenHeight - mSelectCircleItemH - mCurrentKeyboardH -
+                mEditTextBodyHeight - getActivity().findViewById(R.id.toolbar).getHeight()-50;
         if (commentConfig.commentType == CommentConfig.Type.REPLY) {
             //回复评论的情况
             listviewOffset = listviewOffset + mSelectCommentItemOffset;

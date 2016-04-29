@@ -4,7 +4,8 @@
               android:layout_height="match_parent"
               android:orientation="vertical">
 
-    <include layout="@layout/moment_frag_titlebar"/>
+    <include layout="@layout/moment_frag_titlebar"
+        android:id="@+id/frag_titlebar"/>
 
     <com.example.neilhy.pulltorefresh_lib.PtrFrameLayout
         android:id="@+id/FrameInStrFrag"
@@ -18,8 +19,7 @@
         cube_ptr:ptr_ratio_of_header_height_to_refresh="1.2"
         cube_ptr:ptr_resistance="1.7">
 
-        <LinearLayout
-            android:orientation="vertical"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffffff">
@@ -43,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:background="#161616"
+                android:background="#f6f6f6"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="8dp"
@@ -67,7 +67,7 @@
                     android:contentDescription="@null"
                     android:src="@drawable/selector_send"/>
             </LinearLayout>
-        </LinearLayout>
+        </RelativeLayout>
 
     </com.example.neilhy.pulltorefresh_lib.PtrFrameLayout>
 

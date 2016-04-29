@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView mTextViewTitleList;
     TextView mUserName;
     ImageView mUserIcon;
-//    @Bind(R.id.btn_info_in_MainActivity)
-//    ImageButton mBtnInfoInMainActivity;
     @Bind(R.id.btn_contacts_in_MainActivity)
     ImageButton mBtnSearchInMainActivity;
     @Bind(R.id.toolbar)
@@ -82,8 +80,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton fab_add;
     @Bind(R.id.fab_camera)
     FloatingActionButton fab_camera;
+
     @Bind(R.id.menu_button)
     FloatingActionMenu menuButton;
+
     @Bind(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
     @Bind(R.id.navigation_view)
@@ -116,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
         takeUserIconAndName();
     }
-
     private void init() {
         mMapFrgment = new MapFragment();
         mRecommendedFragment = new SharedFragment();
