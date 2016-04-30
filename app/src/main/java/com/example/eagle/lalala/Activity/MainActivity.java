@@ -2,6 +2,8 @@ package com.example.eagle.lalala.Activity;
 
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
@@ -21,6 +23,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -32,6 +35,7 @@ import android.widget.Toast;
 
 import com.example.eagle.lalala.Edit_marks_aty;
 import com.example.eagle.lalala.Fragment.MapFragment;
+import com.example.eagle.lalala.NetWork.HttpUtil;
 import com.example.eagle.lalala.PacelForConvey.ConveyJson;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.PictureWork.TakePicture;
@@ -319,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             String icon=userJson.object.getString("icon");
             String background = userJson.object.getString("background");
             userId = userJson.object.getLong("userID");
+            Log.i("MainActivity:::userId:", userId + "");
             saveUserIcon(icon);
             saveUserBackground(background);
 
@@ -357,8 +362,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private class saveUserInfos extends AsyncTask<HashMap<String,Object>, Void, String> {
         @Override
         protected String doInBackground(HashMap<String,Object>... params) {
-            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
-            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
+            saveUserInfo(params[0]);
+
+//            Intent bindIntent = new Intent(MainActivity.this, WorkWithDatabase.class);
+//            bindService(bindIntent, params[0], BIND_AUTO_CREATE);//绑定服务
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             return null;
         }
 
@@ -374,9 +386,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected void onPostExecute(String str) {
             progressDialog.dismiss();
-            unbindService(connection);
+//            unbindService(connection);
             Toast.makeText(MainActivity.this, "初始化成功", Toast.LENGTH_LONG).show();
         }
     }
 
+    public void saveUserInfo(final HashMap<String, Object> userInfo){
+        WeMarkDatabaseHelper databaseHelper = new WeMarkDatabaseHelper(MainActivity.this, "WeMark.db", null, 1);
+        final SQLiteDatabase db=databaseHelper.getWritableDatabase();
+                db.beginTransaction();
+                try {
+                    int i=db.delete(WeMarkDatabaseHelper.USER_TABLE, null, null);//删除表的数据
+                    Log.i("Database::", "delete "+i);
+                    ContentValues values = new ContentValues();
+                    boolean flag = false;
+                    if ((long) userInfo.get("userId") != 0) {
+                        values.put(WeMarkDatabaseHelper.USER_ID, (long) userInfo.get("userId"));
+                        flag = true;//标志有userId，不为空才可以插入
+                        Log.i("Database:save:", "userId "+(long)userInfo.get("userId"));
+
+                    }
+                    if (userInfo.get("email") != null && !userInfo.get("email").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.EMAIL, userInfo.get("email").toString());
+                        Log.i("Database:save:", "email "+userInfo.get("email").toString());
+
+                    }
+                    if (userInfo.get("userName") != null && !userInfo.get("userName").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.USER_NAME, userInfo.get("userName").toString());
+                        Log.i("Database:save:", "userName "+userInfo.get("userName").toString());
+                    }
+                    if (userInfo.get("password") != null && !userInfo.get("password").toString().equals("")) {
+                        values.put(WeMarkDatabaseHelper.PASSWORD, userInfo.get("password").toString());
+                    }
+                    if (userInfo.get("icon") != null && !userInfo.get("icon").toString().equals("")) {
+//                                Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("icon").toString());
+//                                values.put(WeMarkDatabaseHelper.ICON, HandlePicture.bitmapTobyte(bitmap));
+                        values.put(WeMarkDatabaseHelper.ICON,userInfo.get("icon").toString());
+                    }
+                    if (userInfo.get("background") != null && !userInfo.get("background").toString().equals("")) {
+//                                Bitmap bitmap = HandlePicture.StringToBitmap(userInfo.get("background").toString());
+//                                values.put(WeMarkDatabaseHelper.BACKGROUND, HandlePicture.bitmapTobyte(bitmap));
+                        values.put(WeMarkDatabaseHelper.BACKGROUND,userInfo.get("background").toString());
+                    }
+                    if (userInfo.get("signature") != null) {
+                        values.put(WeMarkDatabaseHelper.SIGNATURE, userInfo.get("signature").toString());
+                    }
+                    if (flag) {
+                        db.insert(WeMarkDatabaseHelper.USER_TABLE, null, values);
+                    }
+                    db.setTransactionSuccessful();
+                    Log.i("Database:save:", "transaction success");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }finally {
+                    db.endTransaction();
+                }
+
+        db.close();
+    }
 }

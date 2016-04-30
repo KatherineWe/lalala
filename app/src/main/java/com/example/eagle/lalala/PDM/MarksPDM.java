@@ -14,6 +14,8 @@ import java.util.List;
 public class MarksPDM {
     private long userId;
     private long markId;
+    private String userName;
+    private Bitmap icon;
     private Timestamp createTime;
     private Authorities authority;
     private double longitude;
@@ -28,9 +30,11 @@ public class MarksPDM {
     public MarksPDM() {
     }
 
-    public MarksPDM(long userId, long markId, Timestamp createTime, double longitude, double latitude, String positionName, String address, String content, String photo, Authorities authority, List<commentsPDM> comments, List<likesPDM> likes) {
+    public MarksPDM(long userId, long markId, String userName,String icon,Timestamp createTime, double longitude, double latitude, String positionName, String address, String content, String photo, Authorities authority, List<commentsPDM> comments, List<likesPDM> likes) {
         this.userId = userId;
         this.markId = markId;
+        this.userName=userName;
+        this.icon = HandlePicture.StringToBitmap(icon);
         this.createTime = createTime;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -55,6 +59,22 @@ public class MarksPDM {
             return true;
         }
         return false;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Bitmap getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = HandlePicture.StringToBitmap(icon);
     }
 
     public long getUserId() {
