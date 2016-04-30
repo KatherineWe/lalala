@@ -8,6 +8,7 @@ import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 
 import com.example.eagle.lalala.MyApplication;
+import com.example.eagle.lalala.PDM.likesPDM;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.bean.FavortItem;
 import com.example.eagle.lalala.spannable.CircleMovementMethod;
@@ -24,13 +25,13 @@ import java.util.List;
 public class FavortListAdapter {
 
     private FavortListView mListView;
-    private List<FavortItem> datas;
+    private List<likesPDM> datas;
 
-    public List<FavortItem> getDatas() {
+    public List<likesPDM> getDatas() {
         return datas;
     }
 
-    public void setDatas(List<FavortItem> datas) {
+    public void setDatas(List<likesPDM> datas) {
         this.datas = datas;
     }
 
@@ -70,11 +71,11 @@ public class FavortListAdapter {
             //添加点赞图标
             builder.append(setImageSpan());
             //builder.append("  ");
-            FavortItem item = null;
+            likesPDM item = null;
             for (int i = 0; i < datas.size(); i++) {
                 item = datas.get(i);
                 if (item != null) {
-                    builder.append(setClickableSpan(item.getUser().getName(), i));
+                    builder.append(setClickableSpan(item.getUserName(), i));
                     if (i != datas.size() - 1) {
                         builder.append(", ");
                     }

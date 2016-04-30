@@ -103,7 +103,7 @@ public class SignUpFragment extends Fragment {
                     JSONObject object=new JSONObject();
                     try {
                         object.put("emailAddr",mInputSignupEmail.getText().toString());
-                        object.put("userName", HttpUtil.toUTFString(mInputNickname.getText().toString()));
+                        object.put("userName", mInputNickname.getText().toString());
                         object.put("password", mInputSignupPassword.getText().toString());
                     } catch (JSONException e) {
                         e.printStackTrace();

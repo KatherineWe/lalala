@@ -14,9 +14,9 @@ import com.example.eagle.lalala.MyApplication;
  */
 public class NameClickListener implements ISpanClick {
     private SpannableString userName;
-    private String userId;
+    private long userId;
 
-    public NameClickListener(SpannableString name, String userid) {
+    public NameClickListener(SpannableString name, long userid) {
         this.userName = name;
         this.userId = userid;
     }

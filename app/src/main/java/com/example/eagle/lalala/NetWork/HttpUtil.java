@@ -77,7 +77,8 @@ public class HttpUtil  {
                     DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
                     String jsonString=object.toString();//将json数据变成string类型
                     Log.i("HttpUtil:object::", jsonString);
-                    dataOutputStream.writeBytes(jsonString);//把json数据发送给服务器
+                  //  dataOutputStream.writeBytes(jsonString);//把json数据发送给服务器
+                    dataOutputStream.write(object.toString().getBytes());
                     dataOutputStream.flush();
                     dataOutputStream.close();
 

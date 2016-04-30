@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         takeUserIconAndName();
     }
     private void init() {
+
         mMapFrgment = new MapFragment();
         mRecommendedFragment = new SharedFragment();
         mFocusedFragment = new SharedFragment();
@@ -152,18 +153,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerLayout.closeDrawer(GravityCompat.START);
 
                 switch (item.getItemId()) {
-                    case R.id.menu_message:
-                        Toast.makeText(MainActivity.this,"message",Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.menu_favorite:
-                      //  CommonUtils.changeFrag(MainActivity.this,"favorite_frag");
-                        break;
-                    case R.id.menu_posted:
-                      //  CommonUtils.changeFrag(MainActivity.this,"posted_frag");
-                        break;
-                    case R.id.menu_setting:
-
-                        break;
+//                    case R.id.menu_message:
+//                        Toast.makeText(MainActivity.this,"message",Toast.LENGTH_SHORT).show();
+//                        break;
+//                   // case R.id.menu_favorite:
+//                      //  CommonUtils.changeFrag(MainActivity.this,"favorite_frag");
+//                  //      break;
+//                    case R.id.menu_setting:
+//
+//                        break;
                     default:
 
                         break;
@@ -270,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 CommonUtils.changeFrag(MainActivity.this,"map_frag");
                 break;
             case R.id.textView_title_list:
-                CommonUtils.changeFrag(MainActivity.this,"recommended_frag");
+                CommonUtils.changeFrag(MainActivity.this,"focused_frag");
                 break;
             case R.id.btn_contacts_in_MainActivity:
                 startActivity(new Intent(MainActivity.this,ContactActivity.class));

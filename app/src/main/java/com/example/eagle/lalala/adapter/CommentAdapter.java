@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.eagle.lalala.PDM.commentsPDM;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.spannable.CircleMovementMethod;
@@ -28,14 +29,14 @@ public class CommentAdapter {
 
     private Context mContext;
     private CommentListView mListview;
-    private List<CommentItem> mDatas;
+    private List<commentsPDM> mDatas;
 
     public CommentAdapter(Context context) {
         mContext = context;
-        mDatas = new ArrayList<CommentItem>();
+        mDatas = new ArrayList<commentsPDM>();
     }
 
-    public CommentAdapter(Context context, List<CommentItem> datas) {
+    public CommentAdapter(Context context, List<commentsPDM> datas) {
         mContext = context;
         setDatas(datas);
     }
@@ -47,14 +48,14 @@ public class CommentAdapter {
         mListview = listView;
     }
 
-    public void setDatas(List<CommentItem> datas) {
+    public void setDatas(List<commentsPDM> datas) {
         if (datas == null) {
-            datas = new ArrayList<CommentItem>();
+            datas = new ArrayList<commentsPDM>();
         }
         mDatas = datas;
     }
 
-    public List<CommentItem> getDatas() {
+    public List<commentsPDM> getDatas() {
         return mDatas;
     }
 
@@ -65,7 +66,7 @@ public class CommentAdapter {
         return mDatas.size();
     }
 
-    public CommentItem getItem(int position) {
+    public commentsPDM getItem(int position) {
         if (mDatas == null) {
             return null;
         }
@@ -85,13 +86,13 @@ public class CommentAdapter {
         final CircleMovementMethod circleMovementMethod = new CircleMovementMethod(R.color.name_selector_color,
                 R.color.name_selector_color);
 
-        final CommentItem bean = mDatas.get(position);
-        String name = bean.getUser().getName();
-        String id = bean.getId();
+        final commentsPDM bean = mDatas.get(position);
+        String name = bean.getFriendName();
+        long id = bean.getFriendId();
         String toReplyName = "";
-        if (bean.getToReplyUser() != null) {
-            toReplyName = bean.getToReplyUser().getName();
-        }
+//        if (bean.getToReplyUser() != null) {
+//            toReplyName = bean.getToReplyUser().getName();
+//        }
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
         builder.append(setClickableSpan(name,id,0));
@@ -134,7 +135,7 @@ public class CommentAdapter {
     }
 
     @NonNull
-    private SpannableString setClickableSpan(String textStr,String id, int position) {
+    private SpannableString setClickableSpan(String textStr,long id, int position) {
         SpannableString subjectSpanText = new SpannableString(textStr);
         subjectSpanText.setSpan(new NameClickable(new NameClickListener(
                         subjectSpanText,id), position), 0, subjectSpanText.length(),

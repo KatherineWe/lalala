@@ -1,6 +1,8 @@
 package com.example.eagle.lalala.mvp.view;
 
 
+import com.example.eagle.lalala.PDM.commentsPDM;
+import com.example.eagle.lalala.PDM.likesPDM;
 import com.example.eagle.lalala.bean.CommentConfig;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.bean.FavortItem;
@@ -13,15 +15,15 @@ import com.example.eagle.lalala.bean.FavortItem;
  */
 public interface ICircleView {
 
-    public void update2DeleteCircle(String circleId);
+    public void update2DeleteCircle(long markId);
 
-    public void update2AddFavorite(int circlePosition, FavortItem addItem);
+    public void update2AddFavorite(int circlePosition, likesPDM addItem);
 
-    public void update2DeleteFavort(int circlePosition, String favortId);
+    public void update2DeleteFavort(int circlePosition, long favortId);
 
-    public void update2AddComment(int circlePosition, CommentItem addItem);
+    public void update2AddComment(int circlePosition, commentsPDM addItem);
 
-    public void update2DeleteComment(int circlePosition, String commentId);
+    public void update2DeleteComment(int circlePosition, long commentId);
 
     public void updateEditTextBodyVisible(int visibility, CommentConfig commentConfig);
 

@@ -19,8 +19,8 @@
         <TextView
             android:gravity="center"
             android:layout_weight="1"
-            android:id="@+id/btn_recommend"
-            android:text="@string/btn_recommend"
+            android:id="@+id/btn_focused"
+            android:text="关注"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
@@ -35,8 +35,8 @@
         <TextView
             android:gravity="center"
             android:layout_weight="1"
-            android:id="@+id/btn_focus"
-            android:text="@string/btn_focus"
+            android:id="@+id/btn_posted"
+            android:text="自己"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 

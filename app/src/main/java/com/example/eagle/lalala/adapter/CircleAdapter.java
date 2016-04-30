@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.ImagePagerActivity;
+import com.example.eagle.lalala.Activity.MainActivity;
 import com.example.eagle.lalala.MyApplication;
 import com.example.eagle.lalala.PDM.MarksPDM;
 import com.example.eagle.lalala.PDM.commentsPDM;
@@ -124,9 +125,8 @@ public class CircleAdapter extends BaseAdapter {
 
         MarksPDM circleItem = DatasUtil.sMarksPDMs_public.get(position);
         //CircleItem circleItem = datas.get(position);
-        final long circleId = circleItem.getUserId();
-        String name = circleItem.getUser().getName();
-        String headImg = circleItem.getUser().getHeadUrl();
+        final long markId = circleItem.getMarkId();
+        final Bitmap headImg = circleItem.getIcon();
         final Bitmap mainImg = circleItem.getPhoto();
         String content = circleItem.getContent();
         String createTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(circleItem.getCreateTime());
@@ -135,39 +135,42 @@ public class CircleAdapter extends BaseAdapter {
         boolean hasFavort = circleItem.hasFavort();
         boolean hasComment = circleItem.hasComment();
 
-        ImageLoader.getInstance().displayImage(headImg, holder.headIv);
-        ImageLoader.getInstance().displayImage(mainImg, holder.imageView);//????
-        holder.nameTv.setText(name);
+        holder.headIv.setImageBitmap(headImg);
+        holder.imageView.setImageBitmap(mainImg);
+//        ImageLoader.getInstance().displayImage(headImg, holder.headIv);
+//        ImageLoader.getInstance().displayImage(mainImg, holder.imageView);//????
+        holder.nameTv.setText(circleItem.getUserName());
         holder.timeTv.setText(createTime);
         holder.contentTv.setText(content);
-        holder.locationTv.setText("爪哇国");
+        holder.locationTv.setText(circleItem.getAddress());
         holder.contentTv.setVisibility(TextUtils.isEmpty(content) ? View.GONE : View.VISIBLE);
-        //holder.imageView.setImageURI(mainImg);
 
-        if (DatasUtil.curUser.getId().equals(circleItem.getUser().getId())) {
+        if (MainActivity.userId == circleItem.getUserId()) {
             holder.deleteBtn.setVisibility(View.VISIBLE);
         } else {
             holder.deleteBtn.setVisibility(View.GONE);
         }
+
         holder.deleteBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 //删除
                 if (mPresenter != null) {
-                    mPresenter.deleteCircle(circleId);
+                    mPresenter.deleteCircle(markId);
                 }
             }
         });
+
         if (hasFavort || hasComment) {
             if (hasFavort) {//处理点赞列表
-                holder.favortListTv.setSpanClickListener(new ISpanClick() {
-                    @Override
-                    public void onClick(int position) {
-                        String userName = favortDatas.get(position).getUser().getName();
-                        String userId = favortDatas.get(position).getUser().getId();
-                        Toast.makeText(MyApplication.getContext(), userName + " &id = " + userId, Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                holder.favortListTv.setSpanClickListener(new ISpanClick() {
+//                    @Override
+//                    public void onClick(int position) {
+//                        String userName = favortDatas.get(position).getUser().getName();
+//                        String userId = favortDatas.get(position).getUser().getId();
+//                        Toast.makeText(MyApplication.getContext(), userName + " &id = " + userId, Toast.LENGTH_SHORT).show();
+//                    }
+//                }); //暂时不设置点击跳转事件
                 holder.favortListAdapter.setDatas(favortDatas);
                 holder.favortListAdapter.notifyDataSetChanged();
                 holder.favortListTv.setVisibility(View.VISIBLE);
@@ -200,7 +203,7 @@ public class CircleAdapter extends BaseAdapter {
                     @Override
                     public void onItemLongClick(int commentPosition) {
                         //长按进行复制或者删除
-                        CommentItem commentItem = commentsDatas.get(commentPosition);
+                        commentsPDM commentItem = commentsDatas.get(commentPosition);
                         CommentDialog dialog = new CommentDialog(mContext, mPresenter, commentItem, position);
                         dialog.show();
                     }
@@ -222,8 +225,8 @@ public class CircleAdapter extends BaseAdapter {
 
         final SnsPopupWindow snsPopupWindow = holder.snsPopupWindow;
         //判断是否已点赞
-        String curUserFavortId = circleItem.getCurUserFavortId(DatasUtil.curUser.getId());
-        if (!TextUtils.isEmpty(curUserFavortId)) {
+        long curUserFavortId = circleItem.getCurUserFavortId(MainActivity.userId);
+        if (curUserFavortId != -1) {
             snsPopupWindow.getmActionItems().get(0).mTitle = "取消";
         } else {
             snsPopupWindow.getmActionItems().get(0).mTitle = "赞";
@@ -242,15 +245,15 @@ public class CircleAdapter extends BaseAdapter {
         final int width = holder.imageView.getMeasuredWidth();
         final int height =  holder.imageView.getMeasuredHeight();
 
-        holder.imageView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<String> temp = new ArrayList<String>();
-                temp.add(mainImg);
-                ImagePagerActivity.imageSize = new ImageSize(width,height);
-                ImagePagerActivity.startImagePagerActivity(mContext,temp , position);
-            }
-        });
+//        holder.imageView.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                List<String> temp = new ArrayList<String>();
+//                temp.add(mainImg);
+//                ImagePagerActivity.imageSize = new ImageSize(width,height);
+//                ImagePagerActivity.startImagePagerActivity(mContext,temp , position);
+//            }
+//        });//先不设点击事件
         return convertView;
     }
 
@@ -289,13 +292,13 @@ public class CircleAdapter extends BaseAdapter {
     }
 
     private class PopupItemClickListener implements SnsPopupWindow.OnItemClickListener {
-        private String mFavorId;
+        private long mFavorId;
         //动态在列表中的位置
         private int mCirclePosition;
         private long mLasttime = 0;
-        private CircleItem mCircleItem;
+        private MarksPDM mCircleItem;
 
-        public PopupItemClickListener(int circlePosition, CircleItem circleItem, String favorId) {
+        public PopupItemClickListener(int circlePosition, MarksPDM circleItem, long favorId) {
             this.mFavorId = favorId;
             this.mCirclePosition = circlePosition;
             this.mCircleItem = circleItem;

@@ -250,11 +250,11 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                     Log.i("Modify::getinfo:", "password null");
                 }
                 if (cursor.getString(cursor.getColumnIndex("icon")) != null&& !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
-                    Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("icon")), 120, 240);
+                    Bitmap bitmap1 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("icon")), 60, 120);
                     iconIv.setImageBitmap(bitmap1);
                 }
                 if (cursor.getString(cursor.getColumnIndex("background")) != null&& !cursor.getString(cursor.getColumnIndex("background")).equals("")) {
-                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("background")), 240, 360);
+                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("background")), 120, 240);
                     backgroundIv.setImageBitmap(bitmap2);
                 }
             } while (cursor.moveToNext());
@@ -378,18 +378,18 @@ public class ModifyUserInfo extends AppCompatActivity implements View.OnClickLis
                     //4.4及以上系统使用这个方法处理图片
                     imageCamera= TakePicture.handleImageOnKitKat(ModifyUserInfo.this, data);
                     iconFile = new File(imageCamera);
-                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 120, 240);
+                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 100, 200);
                     iconIv.setImageBitmap(bitmap2);
                 }else{
                     //4.4以下系统使用这个方法处理图片
                     imageCamera = TakePicture.handleImageBeforeKitKat(ModifyUserInfo.this, data);
                     iconFile = new File(imageCamera);
-                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 120, 240);
+                    Bitmap bitmap2 = HandlePicture.decodeSampleBitmapFromPath(imageCamera, 100, 200);
                     iconIv.setImageBitmap(bitmap2);
                 }
                 break;
             case IconCROP_PHOTO:
-                Bitmap bitmap4 = HandlePicture.decodeSampleBitmapFromPath(iconFile.getAbsolutePath(), 120, 240);
+                Bitmap bitmap4 = HandlePicture.decodeSampleBitmapFromPath(iconFile.getAbsolutePath(), 100, 200);
                 iconIv.setImageBitmap(bitmap4);
                 break;
         }

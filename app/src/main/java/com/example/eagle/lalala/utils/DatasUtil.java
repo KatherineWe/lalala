@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class DatasUtil {
 
-    public static String mCurrentFragment;
+    public static String mCurrentFragment = "map_frag";
     public static final String[] CONTENTS = {"", "哈哈", "今天是个好日子", "呵呵", "图不错",
             "我勒个去"};
     public static final String[] PHOTOS = {
@@ -50,7 +50,7 @@ public class DatasUtil {
 
     public static List<CircleItem> circleDatas;
 
-    public static List<MarksPDM> sMarksPDMs_public;
+    public static List<MarksPDM> sMarksPDMs_public = new ArrayList<MarksPDM>();
 
     public static List<User> users = new ArrayList<User>();
     /**

@@ -1,9 +1,11 @@
 package com.example.eagle.lalala.PDM;
 
 import android.graphics.Bitmap;
+import android.text.TextUtils;
 
 import com.example.eagle.lalala.PDM.BasicEnum.Authorities;
 import com.example.eagle.lalala.PictureWork.HandlePicture;
+import com.example.eagle.lalala.bean.FavortItem;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -171,5 +173,18 @@ public class MarksPDM {
 
     public void setLikes(List<likesPDM> likes) {
         this.likes = likes;
+    }
+
+    public long getCurUserFavortId(long curUserId) {
+        long favortid = -1;
+        if ( hasFavort()) {
+            for (likesPDM item : likes) {
+                if (curUserId == item.getUserId() ) {
+                    favortid = item.getLikeId();
+                    return favortid;
+                }
+            }
+        }
+        return favortid;
     }
 }

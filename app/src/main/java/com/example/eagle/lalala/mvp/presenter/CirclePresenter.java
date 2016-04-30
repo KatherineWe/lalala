@@ -2,6 +2,9 @@ package com.example.eagle.lalala.mvp.presenter;
 
 import android.view.View;
 
+import com.example.eagle.lalala.Activity.MainActivity;
+import com.example.eagle.lalala.PDM.commentsPDM;
+import com.example.eagle.lalala.PDM.likesPDM;
 import com.example.eagle.lalala.bean.CommentConfig;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.bean.FavortItem;
@@ -9,6 +12,10 @@ import com.example.eagle.lalala.mvp.modle.CircleModel;
 import com.example.eagle.lalala.mvp.modle.IDataRequestListener;
 import com.example.eagle.lalala.mvp.view.ICircleView;
 import com.example.eagle.lalala.utils.DatasUtil;
+
+import java.sql.Timestamp;
+import java.util.Random;
+import java.util.UUID;
 
 
 /**
@@ -33,7 +40,7 @@ public class CirclePresenter {
      * @Title: deleteCircle
      * @Description: 删除动态
      */
-    public void deleteCircle(final String circleId) {
+    public void deleteCircle(final long circleId) {
         mCircleModel.deleteCircle(new IDataRequestListener() {
 
             @Override
@@ -55,8 +62,8 @@ public class CirclePresenter {
 
             @Override
             public void loadSuccess(Object object) {
-                FavortItem item = DatasUtil.createCurUserFavortItem();
-                mCircleView.update2AddFavorite(circlePosition, item);
+                likesPDM temp = new likesPDM(6545481, MainActivity.userId,DatasUtil.sMarksPDMs_public.get(circlePosition).getMarkId() ,DatasUtil.sMarksPDMs_public.get(circlePosition).getUserName());
+                mCircleView.update2AddFavorite(circlePosition, temp);
             }
         });
     }
@@ -69,7 +76,7 @@ public class CirclePresenter {
      * @Title: deleteFavort
      * @Description: 取消点赞
      */
-    public void deleteFavort(final int circlePosition, final String favortId) {
+    public void deleteFavort(final int circlePosition, final long favortId) {
         mCircleModel.deleteFavort(new IDataRequestListener() {
 
             @Override
@@ -94,14 +101,14 @@ public class CirclePresenter {
         mCircleModel.addComment(new IDataRequestListener() {
 
             @Override
-            public void loadSuccess(Object object) {
-                CommentItem newItem = null;
-                if (config.commentType == CommentConfig.Type.PUBLIC) {
-                    newItem = DatasUtil.createPublicComment(content);
-                } else if (config.commentType == CommentConfig.Type.REPLY) {
-                    newItem = DatasUtil.createReplyComment(config.replyUser, content);
-                }
+            public void loadSuccess(Object object) {//这里暂时没想到如何去获取MarkId，不影响添加但影响删除
+                commentsPDM newItem = new commentsPDM(651651, 35,MainActivity.userId,"请改我一下",content,new Timestamp(System.currentTimeMillis()));
 
+//                if (config.commentType == CommentConfig.Type.PUBLIC) {
+//                    newItem = DatasUtil.createPublicComment(content);
+//                } else if (config.commentType == CommentConfig.Type.REPLY) {
+//                    newItem = DatasUtil.createReplyComment(config.replyUser, content);
+//                }
                 mCircleView.update2AddComment(config.circlePosition, newItem);
             }
 
@@ -116,7 +123,7 @@ public class CirclePresenter {
      * @Title: deleteComment
      * @Description: 删除评论
      */
-    public void deleteComment(final int circlePosition, final String commentId) {
+    public void deleteComment(final int circlePosition, final long commentId) {
         mCircleModel.deleteComment(new IDataRequestListener() {
 
             @Override

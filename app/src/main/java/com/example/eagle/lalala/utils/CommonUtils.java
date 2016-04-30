@@ -2,6 +2,7 @@ package com.example.eagle.lalala.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -43,13 +44,19 @@ public class CommonUtils {
         Fragment from = context.getSupportFragmentManager().findFragmentByTag(DatasUtil.mCurrentFragment);
         Fragment to = context.getSupportFragmentManager().findFragmentByTag(toTag);
         if(to == null) {
+            SharedFragment temp = new SharedFragment();
+            Bundle bundle = new Bundle();
             switch (toTag)
             {
                 case "posted_frag":
-                    transaction.hide(from).add(R.id.single_frag_container,new SharedFragment(),toTag).commit();
+                    bundle.putString("url","http://119.29.166.177:8080/getMyMarks");
+                    temp.setArguments(bundle);
+                    transaction.hide(from).add(R.id.single_frag_container,temp,toTag).commit();
                     break;
                 case "focused_frag":
-                    transaction.hide(from).add(R.id.single_frag_container,new SharedFragment(),toTag).commit();
+                    bundle.putString("url","http://119.29.166.177:8080/getUpdatedMarks");
+                    temp.setArguments(bundle);
+                    transaction.hide(from).add(R.id.single_frag_container,temp,toTag).commit();
                     break;
                 default:
                     break;

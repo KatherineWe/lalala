@@ -11,6 +11,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.example.eagle.lalala.Activity.MainActivity;
+import com.example.eagle.lalala.PDM.commentsPDM;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.bean.CommentItem;
 import com.example.eagle.lalala.mvp.presenter.CirclePresenter;
@@ -28,11 +30,11 @@ public class CommentDialog extends Dialog implements
 
     private Context mContext;
     private CirclePresenter mPresenter;
-    private CommentItem mCommentItem;
+    private commentsPDM mCommentItem;
     private int mCirclePosition;
 
     public CommentDialog(Context context, CirclePresenter presenter,
-                         CommentItem commentItem, int circlePosition) {
+                         commentsPDM commentItem, int circlePosition) {
         super(context, R.style.comment_dialog);
         mContext = context;
         this.mPresenter = presenter;
@@ -66,8 +68,8 @@ public class CommentDialog extends Dialog implements
         copyTv.setOnClickListener(this);
         TextView deleteTv = (TextView) findViewById(R.id.deleteTv);
         if (mCommentItem != null
-                && DatasUtil.curUser.getId().equals(
-                mCommentItem.getUser().getId())) {
+                && MainActivity.userId ==
+                mCommentItem.getFriendId()) {
             deleteTv.setVisibility(View.VISIBLE);
         } else {
             deleteTv.setVisibility(View.GONE);
@@ -87,7 +89,7 @@ public class CommentDialog extends Dialog implements
                 break;
             case R.id.deleteTv:
                 if (mPresenter != null && mCommentItem != null) {
-                    mPresenter.deleteComment(mCirclePosition, mCommentItem.getId());
+                    mPresenter.deleteComment(mCirclePosition, mCommentItem.getCommentId());
                 }
                 dismiss();
                 break;
