@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         init();
         saveUserInfo();//启用后台获取数据库中用户的数据
     }
-
     @Override
     protected void onStart() {
         super.onStart();
