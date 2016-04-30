@@ -3,6 +3,7 @@ package com.example.eagle.lalala.Fragment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.example.eagle.lalala.Activity.MainActivity;
 import com.example.eagle.lalala.Activity.SignUpActivity;
+import com.example.eagle.lalala.PictureWork.HandlePicture;
 import com.example.eagle.lalala.R;
 import com.example.eagle.lalala.NetWork.HttpCallbackListener;
 import com.example.eagle.lalala.NetWork.HttpUtil;
@@ -28,6 +30,10 @@ import com.example.eagle.lalala.PacelForConvey.ConveyJson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,9 +68,27 @@ public class LoginFragment extends Fragment {
                 case 1:
 //                    Log.i("status4","jsonInHandler:::"+ msg.obj.toString());
 //                    onLoginSuccess((JSONObject) msg.obj);
-                    onLoginSuccess(newJsonObject);
+                    JSONObject object = new JSONObject();
+                    try {
+                        if (newJsonObject.getString("icon") != null) {
+                            object.put("icon",saveUserIcon(newJsonObject.getString("icon")).getAbsolutePath());
+                        }
+                        if (newJsonObject.getString("background") != null) {
+                            object.put("background",saveUserIcon(newJsonObject.getString("background")).getAbsolutePath());
+                        }
+                        object.put("userName", newJsonObject.getString("userName"));
+                        object.put("userID", newJsonObject.getLong("userID"));
+                        object.put("password", newJsonObject.getString("password"));
+                        object.put("emailAddr", newJsonObject.getString("emailAddr"));
+                        object.put("signature", newJsonObject.getString("signature"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    progressDialog.dismiss();
+                    onLoginSuccess(object);
                     break;
                 case -1:
+                    progressDialog.dismiss();
                     onLoginFailed();
                     break;
             }
@@ -111,6 +135,44 @@ public class LoginFragment extends Fragment {
                 startActivityForResult(new Intent(getActivity(),SignUpActivity.class),REQUEST_SIGNUP);
                 break;
         }
+    }
+
+    private File saveUserIcon(String icon) {
+        File iconFile = null;
+        if (icon != null && !icon.equals("")) {
+            iconFile= HandlePicture.createFileForIcon();
+            Bitmap bitmap = HandlePicture.StringToBitmap(icon);
+            try {
+                FileOutputStream out = new FileOutputStream(iconFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+        return iconFile;
+    }
+
+    private File saveUserBackground(String background) {
+        File backgroundFile=null;
+        if (background != null && !background.equals("")) {
+            backgroundFile=HandlePicture.createFileForBackground();
+            Bitmap bitmap = HandlePicture.StringToBitmap(background);
+            try {
+                FileOutputStream out = new FileOutputStream(backgroundFile);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return backgroundFile;
     }
 
     public void onLoginSuccess(JSONObject object) {
@@ -259,7 +321,7 @@ public class LoginFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String s) {
-            progressDialog.dismiss();
+
         }
     }
 }

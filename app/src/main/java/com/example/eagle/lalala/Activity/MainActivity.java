@@ -65,8 +65,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int TAKE_PHOTO=1;
     public static long userId=0;//用户的id
-    public static File iconFile;
-    public static File backgroundFile;
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
@@ -193,39 +191,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TakePicture.createCustomAnimation(menuButton);//设置点击按钮后的动画，星星变叉
     }
 
-    private void saveUserIcon(String icon) {
-        if (icon != null && !icon.equals("")) {
-            iconFile=HandlePicture.createFileForIcon();
-            Bitmap bitmap = HandlePicture.StringToBitmap(icon);
-            try {
-                FileOutputStream out = new FileOutputStream(iconFile);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                out.flush();
-                out.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-    }
 
-    private void saveUserBackground(String background) {
-        if (background != null && !background.equals("")) {
-            backgroundFile=HandlePicture.createFileForBackground();
-            Bitmap bitmap = HandlePicture.StringToBitmap(background);
-            try {
-                FileOutputStream out = new FileOutputStream(backgroundFile);
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                out.flush();
-                out.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private void takeUserIconAndName() {
         WeMarkDatabaseHelper helper = new WeMarkDatabaseHelper(MainActivity.this, "WeMark.db", null, 1);
@@ -240,7 +206,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     if (cursor.getString(cursor.getColumnIndex("icon")) != null && !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
 
-                        mUserIcon.setImageBitmap(BitmapFactory.decodeFile( cursor.getString(cursor.getColumnIndex("icon")) ));
+//                        mUserIcon.setImageBitmap(BitmapFactory.decodeFile( cursor.getString(cursor.getColumnIndex("icon")) ));
+                        mUserIcon.setImageBitmap(HandlePicture.decodeSampleBitmapFromPath(cursor.getString(cursor.getColumnIndex("icon")),60,120));
                     }
                 } while (cursor.moveToNext());
             }
@@ -318,22 +285,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final HashMap<String,Object> userInfo=new HashMap<>();
         try {
             String userName=userJson.object.getString("userName");
-            String icon=userJson.object.getString("icon");
-            String background = userJson.object.getString("background");
+            String icon= userJson.object.getString("icon");
+            String background =userJson.object.getString("background");
             userId = userJson.object.getLong("userID");
             Log.i("MainActivity:::userId:", userId + "");
-            saveUserIcon(icon);
-            saveUserBackground(background);
 
             userInfo.put("userId",userId);
             userInfo.put("email", userJson.object.getString("emailAddr"));
             userInfo.put("userName", userName);
             userInfo.put("password", userJson.object.getString("password"));
-            if (iconFile != null) {
-                userInfo.put("icon", iconFile.getAbsolutePath());
+            if (icon != null && !icon.equals("")) {
+                userInfo.put("icon", icon);
             }
-            if (backgroundFile != null) {
-                userInfo.put("background", backgroundFile.getAbsolutePath());
+            if (background != null && !background.equals("")) {
+                userInfo.put("background", background);
             }
             userInfo.put("signature", userJson.object.getString("signature"));
 
