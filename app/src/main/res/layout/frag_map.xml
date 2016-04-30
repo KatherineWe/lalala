@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/gdmapview"
+        android:background="@color/blue"
         android:text="@string/locate"
         android:id="@+id/btn_locate"/>
 </RelativeLayout>
