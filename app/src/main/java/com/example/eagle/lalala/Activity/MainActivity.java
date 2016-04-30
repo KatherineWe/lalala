@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final int TAKE_PHOTO=1;
     public static long userId=0;//用户的id
+    public static String userName="";//用户的昵称
 
     @Bind(R.id.textView_title_map)
     TextView mTextViewTitleMap;
@@ -201,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (cursor.moveToFirst()) {
                 do {
                     if (cursor.getString(cursor.getColumnIndex("userName")) != null && !cursor.getString(cursor.getColumnIndex("userName")).equals("")) {
+                        userName=cursor.getString(cursor.getColumnIndex("userName"));
                         mUserName.setText(cursor.getString(cursor.getColumnIndex("userName")));
                     }
                     if (cursor.getString(cursor.getColumnIndex("icon")) != null && !cursor.getString(cursor.getColumnIndex("icon")).equals("")) {
@@ -283,11 +285,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ConveyJson userJson=getIntent().getParcelableExtra("userInfo");
         final HashMap<String,Object> userInfo=new HashMap<>();
         try {
-            String userName=userJson.object.getString("userName");
+            userName=userJson.object.getString("userName");
             String icon= userJson.object.getString("icon");
             String background =userJson.object.getString("background");
             userId = userJson.object.getLong("userID");
             Log.i("MainActivity:::userId:", userId + "");
+            Log.i("MainActivity:::object:", userJson.object.toString());
 
             userInfo.put("userId",userId);
             userInfo.put("email", userJson.object.getString("emailAddr"));

@@ -24,7 +24,7 @@ public class NameClickable extends ClickableSpan implements View.OnClickListener
 
     @Override
     public void onClick(View widget) {
-        mListener.onClick(mPosition);
+        mListener.onClick(mPosition);////////////空指针
     }
 
     @Override

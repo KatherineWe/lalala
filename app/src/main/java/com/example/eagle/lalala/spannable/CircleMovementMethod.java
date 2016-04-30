@@ -94,7 +94,7 @@ public class CircleMovementMethod extends BaseMovementMethod {
 
         } else if (action == MotionEvent.ACTION_UP) {
             if (mClickLinks.length > 0) {
-                mClickLinks[0].onClick(widget);
+                mClickLinks[0].onClick(widget);/////////////////////空指针
                 if (mBgSpan != null) {
                     buffer.removeSpan(mBgSpan);
                 }

@@ -70,11 +70,11 @@ public class LoginFragment extends Fragment {
 //                    onLoginSuccess((JSONObject) msg.obj);
                     JSONObject object = new JSONObject();
                     try {
-                        if (newJsonObject.getString("icon") != null) {
+                        if (newJsonObject.getString("icon") != null && !newJsonObject.getString("icon").equals("")) {
                             object.put("icon",saveUserIcon(newJsonObject.getString("icon")).getAbsolutePath());
                         }
-                        if (newJsonObject.getString("background") != null) {
-                            object.put("background",saveUserIcon(newJsonObject.getString("background")).getAbsolutePath());
+                        if (newJsonObject.getString("background") != null && !newJsonObject.getString("background").equals("")) {
+                            object.put("background",saveUserBackground(newJsonObject.getString("background")).getAbsolutePath());
                         }
                         object.put("userName", newJsonObject.getString("userName"));
                         object.put("userID", newJsonObject.getLong("userID"));
@@ -85,6 +85,7 @@ public class LoginFragment extends Fragment {
                         e.printStackTrace();
                     }
                     progressDialog.dismiss();
+                    Log.i("Login::object:", object.toString());
                     onLoginSuccess(object);
                     break;
                 case -1:
@@ -194,7 +195,7 @@ public class LoginFragment extends Fragment {
         String email = mInputEmail.getText().toString();
         String password = mInputPassword.getText().toString();
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mInputEmail.setError("请输入有效邮件");
+            mInputEmail.setError("请输入有效邮箱");
             valid = false;
         } else {
             mInputEmail.setError(null);

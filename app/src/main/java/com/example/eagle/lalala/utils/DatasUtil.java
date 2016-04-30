@@ -68,7 +68,7 @@ public class DatasUtil {
     public static final User curUser = new User("0", "道不明", HEADIMG[0]);
 
     static {
-        User user1 = new User("1", "邓梓君", HEADIMG[1]);
+        User user1 = new User("1", "老邓", HEADIMG[1]);
         User user2 = new User("2", "Guan_Suns", HEADIMG[2]);
         User user3 = new User("3", "Katherine", HEADIMG[3]);
         User user4 = new User("4", "hy", HEADIMG[4]);

@@ -102,7 +102,7 @@ public class CirclePresenter {
 
             @Override
             public void loadSuccess(Object object) {//这里暂时没想到如何去获取MarkId，不影响添加但影响删除
-                commentsPDM newItem = new commentsPDM(651651, 35,MainActivity.userId,"请改我一下",content,new Timestamp(System.currentTimeMillis()));
+                commentsPDM newItem = new commentsPDM(651651, 35,MainActivity.userId,MainActivity.userName,content,new Timestamp(System.currentTimeMillis()));
 
 //                if (config.commentType == CommentConfig.Type.PUBLIC) {
 //                    newItem = DatasUtil.createPublicComment(content);

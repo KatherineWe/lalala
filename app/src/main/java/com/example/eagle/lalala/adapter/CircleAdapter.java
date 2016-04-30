@@ -142,7 +142,7 @@ public class CircleAdapter extends BaseAdapter {
         holder.nameTv.setText(circleItem.getUserName());
         holder.timeTv.setText(createTime);
         holder.contentTv.setText(content);
-        holder.locationTv.setText(circleItem.getAddress());
+        holder.locationTv.setText(circleItem.getPositionName());////这里改成显示地点名字
         holder.contentTv.setVisibility(TextUtils.isEmpty(content) ? View.GONE : View.VISIBLE);
 
         if (MainActivity.userId == circleItem.getUserId()) {

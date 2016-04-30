@@ -136,7 +136,7 @@ public class SignUpFragment extends Fragment {
         }
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            mInputSignupEmail.setError("请输入有效邮件");
+            mInputSignupEmail.setError("请输入有效邮箱");
             valid = false;
         } else {
             mInputSignupEmail.setError(null);

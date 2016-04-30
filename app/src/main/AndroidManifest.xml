@@ -20,7 +20,7 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo_wm"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
@@ -28,7 +28,7 @@
 
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="a7c433c1fc6b7d36fefd01f861b819ea"/>
+            android:value="7f7412b3dc99de8fc8f8e1b44599a5b1"/>
 
         <activity android:name=".Activity.LoginActivity">
             <intent-filter>
